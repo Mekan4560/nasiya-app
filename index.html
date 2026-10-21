@@ -164,6 +164,29 @@ button{cursor:pointer}
 :root[data-theme="dark"] .warn{background:#3A3018;color:#E8C26A}
 .paybtn{border:0;border-radius:10px;padding:10px;font-weight:700;background:var(--green);color:#fff;width:100%;margin-top:8px}
 .pend{margin-top:8px;font-size:13px;color:var(--muted)}
+.autochips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.autochips button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-weight:600;font-size:13px}
+.autochips button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.admbtn{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.adm{padding:12px 16px 24px;display:flex;flex-direction:column;gap:10px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;min-width:0}
+.kpi span{display:block;font-size:12px;color:var(--muted)}
+.kpi b{display:block;font-size:20px;margin-top:2px;overflow-wrap:anywhere}
+.kpi small{font-size:12px;color:var(--green);font-weight:600}
+.dchart{display:flex;align-items:flex-end;gap:4px;height:100px}
+.dchart div{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px}
+.dchart i{display:block;width:100%;max-width:18px;background:var(--blue);border-radius:3px 3px 0 0}
+.dchart small{font-size:9px;color:var(--muted)}
+.dchart em{font-style:normal;font-size:10px;color:var(--muted)}
+.fun div{display:flex;align-items:center;gap:8px;font-size:13px;margin:4px 0}
+.fun span{min-width:118px}
+.fun i{flex:1;height:18px;background:var(--blue-soft);border-radius:5px;position:relative;overflow:hidden}
+.fun i b{position:absolute;left:0;top:0;bottom:0;background:var(--blue);border-radius:5px}
+.shoprow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.shoprow small{color:var(--muted);font-size:12px;grid-column:1/-1}
+.pill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--green-soft);color:var(--green);align-self:center}
+.pill.off{background:var(--red-soft);color:var(--red)}
 @media (prefers-reduced-motion:no-preference){ .sheet{animation:up .2s ease-out} @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}} }
 </style>
 </head>
@@ -209,6 +232,8 @@ const T = {
     noTg: "Bu ilova Telegram ichida ochiladi", noTgSub: "Botni oching va pastdagi «Ilova» tugmasini bosing.", openBot: "Botni ochish",
     newShop: "Do'koningizni oching", newShopSub: "Nasiyani shu yerga yozasiz, xaridorga Telegram orqali xabar boradi.", shopPh: "Do'kon nomi", create: "Do'kon ochish",
     myTitle: "Qarzlaringiz", myHist: "Tarix", nothing: "Hali yozuv yo'q",
+    autoTitle: "Avto-eslatma", autoNote: "Bot qarzdorlarga o'zi eslatadi: soat 10:00 da, oxirgi to'lov yoki eslatmadan N kun o'tgach. Qarz to'langach to'xtaydi.",
+    every: d => `${d} kun`, autoOffB: "O'chiq", tAuto: "Saqlandi", custAutoOn: "Avto-eslatma ✓", custAutoOff: "Avto-eslatma ✗", tCustOn: "Avto-eslatma yoqildi", tCustOff: "Avto-eslatma o'chirildi",
     payBtn: "To'lash", payTitle: "Kartaga o'tkazish", payHint: "Click, Payme yoki bank ilovasi orqali o'tkazing, keyin pastdagi tugmani bosing.", payWarn: "Pulni faqat shu kartaga o'tkazing.",
     copyCard: "Raqamni nusxalash", tCardCopied: "Karta raqami nusxalandi", paidBtn: a => `To'ladim · ${fm(a)} so'm`, tClaim: "So'rov yuborildi. Do'kon tasdiqlashini kuting",
     pendingTxt: a => `${fm(a)} so'm — do'kon tasdiqlashini kutmoqda`, noCardC: "Do'kon hali karta qo'shmagan", tPending: "Avvalgi so'rov hali tasdiqlanmagan", tNoDebt: "Qarzingiz yo'q",
@@ -235,6 +260,8 @@ const T = {
     noTg: "Это приложение открывается внутри Telegram", noTgSub: "Откройте бота и нажмите кнопку «Ilova» внизу.", openBot: "Открыть бота",
     newShop: "Откройте свой магазин", newShopSub: "Записывайте долги здесь, покупатель получит сообщение в Telegram.", shopPh: "Название магазина", create: "Открыть магазин",
     myTitle: "Ваши долги", myHist: "История", nothing: "Записей пока нет",
+    autoTitle: "Автонапоминания", autoNote: "Бот сам напоминает должникам: в 10:00, через N дней после последней оплаты или напоминания. Долг погашен — напоминания прекращаются.",
+    every: d => `${d} дн.`, autoOffB: "Выкл.", tAuto: "Сохранено", custAutoOn: "Автонапом. ✓", custAutoOff: "Автонапом. ✗", tCustOn: "Автонапоминания включены", tCustOff: "Автонапоминания выключены",
     payBtn: "Оплатить", payTitle: "Перевод на карту", payHint: "Переведите через Click, Payme или приложение банка, затем нажмите кнопку ниже.", payWarn: "Переводите только на эту карту.",
     copyCard: "Скопировать номер", tCardCopied: "Номер карты скопирован", paidBtn: a => `Я оплатил · ${fm(a)} сум`, tClaim: "Заявка отправлена. Ждите подтверждения магазина",
     pendingTxt: a => `${fm(a)} сум — ждёт подтверждения магазина`, noCardC: "Магазин ещё не добавил карту", tPending: "Предыдущая заявка ещё не подтверждена", tNoDebt: "У вас нет долга",
@@ -244,7 +271,7 @@ const T = {
   },
 };
 
-const S = { data: null, lang: "uz", tab: "cust", filter: "all", q: "", view: null, hist: null, sheet: null, busy: false, toast: null };
+const S = { admin: null, adminOpen: false, data: null, lang: "uz", tab: "cust", filter: "all", q: "", view: null, hist: null, sheet: null, busy: false, toast: null };
 const L = () => T[S.lang];
 
 /* ---------- api ---------- */
@@ -311,6 +338,7 @@ function page() {
   if (d.role === "error") return `<div class="center"><h1 style="font-size:18px">${l.loadErr}</h1><p>${l.err}</p><button class="main" data-a="reload" style="width:auto;padding:12px 20px">${l.retry}</button></div>`;
   if (d.role === "new") return `<div class="center"><div class="logo">${logoSvg()}</div><h1>Nasiya<span>Daftar</span></h1><h2 style="font-size:18px;margin:14px 0 4px">${l.newShop}</h2><p>${l.newShopSub}</p>
     <div style="display:flex;flex-direction:column;gap:8px;text-align:left"><input class="inp" id="shopname" placeholder="${l.shopPh}" maxlength="80" autocomplete="off"><div class="err" id="shoperr"></div><button class="main" data-a="createShop">${l.create}</button></div></div>`;
+  if (S.adminOpen) return adminPage();
   if (d.role === "customer") return customerPage();
   if (S.view && S.hist) return custView();
   return home();
@@ -323,7 +351,7 @@ function home() {
   const tot = cs.reduce((s, c) => s + Math.max(0, c.balance), 0);
   const today = d.week[d.week.length - 1] || { debt: 0, pay: 0 };
   const hasMy = !!(d.mine && d.mine.length), myDue = hasMy && d.mine.some(m => m.balance > 0);
-  const head = `<div class="hero"><div class="top"><span class="shop">${esc(d.shop.name)}</span>${langSw()}</div>
+  const head = `<div class="hero"><div class="top"><span class="shop">${esc(d.shop.name)}</span><span style="display:flex;align-items:center;gap:6px">${d.isAdmin ? `<button class="admbtn" data-a="admin">Admin</button>` : ""}${langSw()}</span></div>
     <div class="big num">${fm(tot)} <span>${l.sum}</span></div>
     <div class="stats"><div class="stat"><b class="num">${cs.filter(c => c.balance > 0).length}</b><span>${l.debtors}</span></div><div class="stat"><b class="num">+${fm(today.debt)}</b><span>${l.today}</span></div><div class="stat"><b class="num">−${fm(today.pay)}</b><span>${l.paid}</span></div></div></div>
     ${claimsBox()}
@@ -346,6 +374,33 @@ function home() {
     <div class="list">${body}</div>
     <button class="fab" data-a="sheet" data-v="debt">${l.fab}</button>`;
 }
+function fmM(n) { n = Number(n) || 0; return n >= 1e6 ? (n / 1e6).toFixed(1).replace(".", ",") + " млн" : fm(n); }
+function ago(iso) { if (!iso) return "нет записей"; const d = Math.floor((Date.now() - Date.parse(iso)) / 864e5); return d <= 0 ? "сегодня" : d === 1 ? "вчера" : `${d} дн. назад`; }
+function adminPage() {
+  const s = S.admin && S.admin.stats;
+  const head = `<div class="hero"><div class="top"><span class="shop">Админ · Nasiya Daftar</span><button class="admbtn" data-a="adminclose" aria-label="Закрыть">✕</button></div><div class="big" style="font-size:20px">Статистика</div></div>`;
+  if (!S.admin) return head + `<div class="spin" role="status"></div>`;
+  if (!s) return head + `<div class="empty">Нет доступа</div>`;
+  const f = s.funnel || [], fl = ["Нажали Start", "Открыли магазин", "Записали 1-й долг", "Покупатель в боте", "Добавили карту"], fmax = Math.max(1, f[0] || 1);
+  const dmax = Math.max(1, ...(s.daily || []).map(x => x.n)), cl = s.claims7 || {};
+  return head + `<div class="adm">
+    <div class="kpis">
+      <div class="kpi"><span>Магазинов</span><b class="num">${s.shops}</b><small>+${s.shopsNew7} за 7 дн.</small></div>
+      <div class="kpi"><span>Активны за 7 дн.</span><b class="num">${s.active7}</b><small>${s.shops ? Math.round(s.active7 / s.shops * 100) : 0}% от всех</small></div>
+      <div class="kpi"><span>Покупателей</span><b class="num">${s.customers}</b><small>в боте: ${s.linked}</small></div>
+      <div class="kpi"><span>Записей за 7 дн.</span><b class="num">${s.entries7}</b><small>до этого: ${s.entriesPrev7}</small></div>
+      <div class="kpi"><span>Долг в обороте</span><b class="num">${fmM(s.debt)}</b><small>сум</small></div>
+      <div class="kpi"><span>Оплачено за 7 дн.</span><b class="num">${fmM(s.paid7)}</b><small>через карту ${fmM(s.paidCard7)}</small></div>
+      <div class="kpi"><span>Заявки «To'ladim»</span><b class="num">${(cl.confirmed || 0) + (cl.rejected || 0) + (cl.pending || 0)}</b><small>✓${cl.confirmed || 0} · ✗${cl.rejected || 0} · ⏳${cl.pending || 0}</small></div>
+      <div class="kpi"><span>Автонапоминаний</span><b class="num">${s.auto7}</b><small>оплатили за 3 дн.: ${s.autoPaid7}</small></div>
+    </div>
+    <div class="box"><h3>Новые магазины, 14 дней</h3><div class="dchart" role="img" aria-label="Новые магазины по дням">${(s.daily || []).map((x, i) => `<div><em>${x.n || ""}</em><i style="height:${Math.max(3, x.n / dmax * 100)}%"></i><small>${i % 3 ? "" : x.day.slice(8, 10) + "." + x.day.slice(5, 7)}</small></div>`).join("")}</div></div>
+    <div class="box fun"><h3>Воронка</h3>${fl.map((t, i) => `<div><span>${t}</span><i><b style="width:${(f[i] || 0) / fmax * 100}%"></b></i><b class="num">${f[i] || 0}</b></div>`).join("")}</div>
+    <div class="box"><h3>Магазины</h3>${(s.list || []).map(x => { const act = x.last && Date.now() - Date.parse(x.last) < 7 * 864e5; return `<div class="shoprow"><b>${esc(x.name)}</b><span class="pill ${act ? "" : "off"}">${act ? "активен" : "спит"}</span><small>${x.customers} покуп. · в боте ${x.linked} · долг ${fmM(x.debt)} · ${ago(x.last)}${x.card ? " · карта ✓" : ""}${x.auto ? "" : " · автонапом. выкл."}</small></div>`; }).join("") || `<div class="empty">Пока нет</div>`}</div>
+    <p style="margin:0;color:var(--muted);font-size:12px">Тестовые магазины не учитываются. «Спит» — нет записей 7+ дней.</p>
+  </div>`;
+}
+async function openAdmin() { S.adminOpen = true; S.admin = null; render(); syncBack(); const r = await api("admin"); S.admin = r.error ? {} : r; render(); }
 function claimsBox() {
   const d = S.data, l = L(), cl = d.claims || [];
   let h = "";
@@ -364,6 +419,8 @@ function report() {
     <div class="box"><div class="kv"><span>${l.rTot}</span><b class="num">${fm(tot)} ${l.sum}</b></div><div class="kv"><span>${l.rDebtors}</span><b class="num">${cs.filter(c => c.balance > 0).length}</b></div><div class="kv"><span>${l.rClients}</span><b class="num">${cs.length}</b></div><div class="kv"><span>${l.rLinked}</span><b class="num">${cs.filter(c => c.linked).length}</b></div></div>
     <div class="box"><h3>${l.rWeek}</h3><div class="bars">${d.week.map(w => `<div class="bar" title="+${fm(w.debt)} / −${fm(w.pay)}"><div class="pair"><i class="d" style="height:${w.debt / max * 100}%"></i><i class="p" style="height:${w.pay / max * 100}%"></i></div><small>${l.wd[new Date(w.day + "T12:00:00").getDay()]}</small></div>`).join("")}</div>
       <div class="legend"><span><i style="background:var(--red)"></i>${l.lD}</span><span><i style="background:var(--green)"></i>${l.lP}</span></div></div>
+    <div class="box"><h3>${l.autoTitle}</h3><p style="margin:0;color:var(--muted);font-size:13px">${l.autoNote}</p>
+      <div class="autochips" role="group" aria-label="${l.autoTitle}">${[3, 7, 14, 0].map(v => `<button data-a="setauto" data-v="${v}" aria-pressed="${(d.shop.auto || 0) === v}">${v ? l.every(v) : l.autoOffB}</button>`).join("")}</div></div>
     <div class="box"><h3>${l.cardTitle}</h3>${d.shop.card ? `<div class="kv"><span class="num">${fmtCard(d.shop.card)}</span><b>${cardBrand(d.shop.card)}</b></div>${d.shop.holder ? `<div class="kv"><span>${esc(d.shop.holder)}</span></div>` : ""}<p style="margin:6px 0 8px;color:var(--muted);font-size:13px">${l.cardNote}</p><button class="ghost" data-a="cardsheet">${l.cardChange}</button>` : `<p style="margin:0 0 8px;color:var(--muted);font-size:13px">${l.noCardOwner}. ${l.cardBanner}</p><button class="main" data-a="cardsheet">${l.cardAdd}</button>`}</div>
     <div class="box"><h3>${l.rLate}</h3>${late.length ? late.map(c => `<div class="kv"><span>${esc(c.name)} · ${l.days(c.days)}</span><b class="num" style="color:var(--red)">${fm(c.balance)}</b></div>`).join("") : `<span style="color:var(--muted)">${l.rNoLate}</span>`}</div>
   </div>`;
@@ -378,14 +435,14 @@ function custView() {
     <button class="a-rem" data-a="remind" ${b > 0 && c.linked ? "" : "disabled"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>${l.aRem}</button>
     <button class="a-inv" data-a="invite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>${l.aInv}</button>
    </div>
-   <div class="acts2"><button data-a="phone">${l.aPhone}</button><button class="del" data-a="askdel">${l.aDel}</button></div>
+   <div class="acts2"><button data-a="phone">${l.aPhone}</button>${c.linked && S.data.shop.auto ? `<button data-a="custauto" data-v="${c.auto ? 0 : 1}">${c.auto ? l.custAutoOn : l.custAutoOff}</button>` : ""}<button class="del" data-a="askdel">${l.aDel}</button></div>
    <div class="sec">${l.hist}</div>
    <div class="hist">${S.hist.entries.length ? S.hist.entries.map(o => `<div class="h ${o.deleted ? "off" : ""}"><div class="t"><b>${o.kind === "debt" ? esc(o.note || l.noNote) : l.pay}</b><small class="num">${when(o.at)}</small></div>
      <span class="v num ${o.kind === "debt" ? "d" : "p"}">${o.kind === "debt" ? "+" : "−"}${fm(o.amount)}</span>${o.deleted ? "<span></span>" : `<button data-a="undo" data-v="${o.id}">${l.undo}</button>`}</div>`).join("") : `<div class="empty">${l.nothing}</div>`}</div>`;
 }
 function customerPage() {
   const d = S.data, l = L();
-  return `<div class="hero"><div class="top"><span class="shop">Nasiya Daftar</span>${langSw()}</div><div class="big" style="font-size:22px">${l.myTitle}</div></div>` + myBody();
+  return `<div class="hero"><div class="top"><span class="shop">Nasiya Daftar</span><span style="display:flex;align-items:center;gap:6px">${d.isAdmin ? `<button class="admbtn" data-a="admin">Admin</button>` : ""}${langSw()}</span></div><div class="big" style="font-size:22px">${l.myTitle}</div></div>` + myBody();
 }
 function myBody() {
   const d = S.data, l = L();
@@ -475,9 +532,10 @@ function renderLayer() {
 }
 function syncBack() {
   if (!tg || !tg.BackButton) return;
-  if (S.sheet || S.view) tg.BackButton.show(); else tg.BackButton.hide();
+  if (S.sheet || S.view || S.adminOpen) tg.BackButton.show(); else tg.BackButton.hide();
 }
 function goBack() {
+  if (S.adminOpen && !S.sheet) { S.adminOpen = false; render(); window.scrollTo(0, 0); return; }
   if (S.sheet) { S.sheet = null; renderLayer(); syncBack(); return; }
   if (S.view) { S.view = null; S.hist = null; render(); window.scrollTo(0, 0); }
 }
@@ -564,6 +622,19 @@ document.addEventListener("click", async e => {
       if (r.error) { toast(errMsg(r), { err: true }); return; }
       toast(l.tRestored); await load();
     }); break;
+    case "admin": openAdmin(); break;
+    case "adminclose": S.adminOpen = false; render(); window.scrollTo(0, 0); break;
+    case "setauto": await run(async () => {
+      const r = await api("setAuto", { days: Number(v) });
+      if (r.error) { toast(errMsg(r), { err: true }); return; }
+      S.data.shop.auto = r.auto; toast(l.tAuto); render();
+    }); break;
+    case "custauto": await run(async () => {
+      const on = v === "1";
+      const r = await api("setCustAuto", { cid: S.view, on });
+      if (r.error) { toast(errMsg(r), { err: true }); return; }
+      if (S.hist) S.hist.customer.auto = on; toast(on ? l.tCustOn : l.tCustOff); render();
+    }); break;
     case "cardsheet": S.sheet = { kind: "card" }; renderLayer(); syncBack(); break;
     case "savecard": await run(async () => {
       const sh = S.sheet, d = String(sh.card || "").replace(/[\s-]/g, "");
@@ -620,7 +691,8 @@ document.addEventListener("input", e => {
   const lc = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.language_code) || navigator.language || "";
   S.lang = String(lc).startsWith("ru") ? "ru" : "uz";
   if (!tg || !tg.initData) { render(); return; }
-  load();
+  if (location.hash === "#admin") S.adminOpen = true;
+  load().then(() => { if (S.adminOpen) openAdmin(); });
 })();
 </script>
 </body>
