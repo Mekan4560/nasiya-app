@@ -187,6 +187,19 @@ button{cursor:pointer}
 .shoprow small{color:var(--muted);font-size:12px;grid-column:1/-1}
 .pill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--green-soft);color:var(--green);align-self:center}
 .pill.off{background:var(--red-soft);color:var(--red)}
+.pill.warn{background:#FFF4D6;color:#7A5600} .pill.trial{background:var(--blue-soft);color:var(--blue)}
+:root[data-theme="dark"] .pill.warn{background:#3A3018;color:#E8C26A}
+button.shoprow{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);color:inherit}
+.blk{margin:12px 16px 0;background:var(--red-soft);color:var(--red);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.blk b{font-size:15px}
+.blk a{align-self:flex-start;background:var(--red);color:#fff;text-decoration:none;border-radius:10px;padding:8px 12px;font-weight:700}
+.subwarn{margin:12px 16px 0;background:#FFF4D6;color:#7A5600;border-radius:14px;padding:10px 12px;font-size:13px;font-weight:600}
+:root[data-theme="dark"] .subwarn{background:#3A3018;color:#E8C26A}
+.abtns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.abtns button{border:0;border-radius:12px;padding:11px;font-weight:700;background:var(--blue-soft);color:var(--blue)}
+.abtns .g{background:var(--green);color:#fff} .abtns .r{background:var(--red);color:#fff} .abtns .o{background:var(--card);border:1px solid var(--line);color:var(--ink)}
+.abtns .full{grid-column:1/-1}
+.adm textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px;font:inherit;color:inherit;resize:vertical}
 @media (prefers-reduced-motion:no-preference){ .sheet{animation:up .2s ease-out} @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}} }
 </style>
 </head>
@@ -232,6 +245,9 @@ const T = {
     noTg: "Bu ilova Telegram ichida ochiladi", noTgSub: "Botni oching va pastdagi «Ilova» tugmasini bosing.", openBot: "Botni ochish",
     newShop: "Do'koningizni oching", newShopSub: "Nasiyani shu yerga yozasiz, xaridorga Telegram orqali xabar boradi.", shopPh: "Do'kon nomi", create: "Do'kon ochish",
     myTitle: "Qarzlaringiz", myHist: "Tarix", nothing: "Hali yozuv yo'q",
+    excel: "📥 Excel yuklab olish", tExcel: "Excel fayl bot chatiga yuborildi", tExcelEmpty: "Hali yozuvlar yo'q",
+    blkTitle: "Do'kon vaqtincha bloklangan", blkText: (r, p) => `Sabab: ${r}. Ma'lumotlaringiz saqlanadi. Obunani to'lang — do'kon darhol ochiladi. Oylik: ${fm(p)} so'm.`, contact: "Admin bilan bog'lanish",
+    tBlocked: "Do'kon bloklangan — admin bilan bog'laning", reasonDef: "Obuna to'lanmagan", subTitle: "Obuna", subFree: "Bepul", subUntil: d => `${d} gacha`, subLeft: n => n > 0 ? `Obuna ${n} kundan keyin tugaydi — to'lashni unutmang.` : "Obuna muddati tugadi — to'lang, aks holda do'kon bloklanadi.", subPrice: p => `Oylik: ${fm(p)} so'm`,
     autoTitle: "Avto-eslatma", autoNote: "Bot qarzdorlarga o'zi eslatadi: soat 10:00 da, oxirgi to'lov yoki eslatmadan N kun o'tgach. Qarz to'langach to'xtaydi.",
     every: d => `${d} kun`, autoOffB: "O'chiq", tAuto: "Saqlandi", custAutoOn: "Avto-eslatma ✓", custAutoOff: "Avto-eslatma ✗", tCustOn: "Avto-eslatma yoqildi", tCustOff: "Avto-eslatma o'chirildi",
     payBtn: "To'lash", payTitle: "Kartaga o'tkazish", payHint: "Click, Payme yoki bank ilovasi orqali o'tkazing, keyin pastdagi tugmani bosing.", payWarn: "Pulni faqat shu kartaga o'tkazing.",
@@ -260,6 +276,9 @@ const T = {
     noTg: "Это приложение открывается внутри Telegram", noTgSub: "Откройте бота и нажмите кнопку «Ilova» внизу.", openBot: "Открыть бота",
     newShop: "Откройте свой магазин", newShopSub: "Записывайте долги здесь, покупатель получит сообщение в Telegram.", shopPh: "Название магазина", create: "Открыть магазин",
     myTitle: "Ваши долги", myHist: "История", nothing: "Записей пока нет",
+    excel: "📥 Выгрузить в Excel", tExcel: "Файл Excel отправлен в чат с ботом", tExcelEmpty: "Записей пока нет",
+    blkTitle: "Магазин временно заблокирован", blkText: (r, p) => `Причина: ${r}. Данные сохранены. Оплатите подписку — магазин сразу откроется. В месяц: ${fm(p)} сум.`, contact: "Написать админу",
+    tBlocked: "Магазин заблокирован — напишите администратору", reasonDef: "Подписка не оплачена", subTitle: "Подписка", subFree: "Бесплатно", subUntil: d => `до ${d}`, subLeft: n => n > 0 ? `Подписка закончится через ${n} дн. — не забудьте оплатить.` : "Подписка закончилась — оплатите, иначе магазин будет заблокирован.", subPrice: p => `В месяц: ${fm(p)} сум`,
     autoTitle: "Автонапоминания", autoNote: "Бот сам напоминает должникам: в 10:00, через N дней после последней оплаты или напоминания. Долг погашен — напоминания прекращаются.",
     every: d => `${d} дн.`, autoOffB: "Выкл.", tAuto: "Сохранено", custAutoOn: "Автонапом. ✓", custAutoOff: "Автонапом. ✗", tCustOn: "Автонапоминания включены", tCustOff: "Автонапоминания выключены",
     payBtn: "Оплатить", payTitle: "Перевод на карту", payHint: "Переведите через Click, Payme или приложение банка, затем нажмите кнопку ниже.", payWarn: "Переводите только на эту карту.",
@@ -271,7 +290,7 @@ const T = {
   },
 };
 
-const S = { admin: null, adminOpen: false, data: null, lang: "uz", tab: "cust", filter: "all", q: "", view: null, hist: null, sheet: null, busy: false, toast: null };
+const S = { adminShopId: null, adminShop: null, blkReason: null, amsg: "", admin: null, adminOpen: false, data: null, lang: "uz", tab: "cust", filter: "all", q: "", view: null, hist: null, sheet: null, busy: false, toast: null };
 const L = () => T[S.lang];
 
 /* ---------- api ---------- */
@@ -327,6 +346,7 @@ function errMsg(r) {
   if (r.error === "noCard") return l.noCardC;
   if (r.error === "badAmount") return l.tooMuch(r.max || 0);
   if (r.error === "gone") return l.tGone;
+  if (r.error === "blocked") return l.tBlocked;
   return l.err;
 }
 
@@ -354,6 +374,7 @@ function home() {
   const head = `<div class="hero"><div class="top"><span class="shop">${esc(d.shop.name)}</span><span style="display:flex;align-items:center;gap:6px">${d.isAdmin ? `<button class="admbtn" data-a="admin">Admin</button>` : ""}${langSw()}</span></div>
     <div class="big num">${fm(tot)} <span>${l.sum}</span></div>
     <div class="stats"><div class="stat"><b class="num">${cs.filter(c => c.balance > 0).length}</b><span>${l.debtors}</span></div><div class="stat"><b class="num">+${fm(today.debt)}</b><span>${l.today}</span></div><div class="stat"><b class="num">−${fm(today.pay)}</b><span>${l.paid}</span></div></div></div>
+    ${ownerBanner()}
     ${claimsBox()}
     <div class="tabs" role="tablist"><button role="tab" data-a="tab" data-v="cust" aria-selected="${S.tab === "cust"}">${l.tCust}</button><button role="tab" data-a="tab" data-v="rep" aria-selected="${S.tab === "rep"}">${l.tRep}</button>${hasMy ? `<button role="tab" data-a="tab" data-v="my" aria-selected="${S.tab === "my"}">${l.tMy}${myDue ? ` <span class="num" style="color:var(--red)">·</span>` : ""}</button>` : ""}</div>`;
   if (S.tab === "rep") return head + report();
@@ -372,11 +393,49 @@ function home() {
   return head + `<label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" placeholder="${l.search}" value="${esc(S.q)}" aria-label="${l.search}" autocomplete="off"></label>
     <div class="chips">${f.map(([k, t]) => `<button data-a="filter" data-v="${k}" aria-pressed="${S.filter === k}">${t}</button>`).join("")}</div>
     <div class="list">${body}</div>
-    <button class="fab" data-a="sheet" data-v="debt">${l.fab}</button>`;
+    ${d.shop.blocked ? "" : `<button class="fab" data-a="sheet" data-v="debt">${l.fab}</button>`}`;
 }
+function dmy(iso) { if (!iso) return "—"; const d = new Date(iso); return String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0") + "." + d.getFullYear(); }
+function daysLeft(iso) { return iso ? Math.ceil((Date.parse(iso) - Date.now()) / 864e5) : 999; }
+function ownerBanner() {
+  const d = S.data, l = L(), sh = d.shop;
+  if (sh.blocked) return `<div class="blk" role="alert"><b>⛔️ ${l.blkTitle}</b><span>${esc(l.blkText(sh.reason || l.reasonDef, d.price || 0))}</span>${d.contact ? `<a href="${esc(d.contact)}" data-a="contact">${l.contact}</a>` : ""}</div>`;
+  if (!sh.free && daysLeft(sh.paidUntil) <= 3) return `<div class="subwarn">⚠️ ${l.subLeft(Math.max(0, daysLeft(sh.paidUntil)))} ${l.subPrice(d.price || 0)}</div>`;
+  return "";
+}
+function subStatus(x) {
+  if (x.blocked) return ["off", "заблокирован"];
+  if (x.free) return ["", "бесплатно"];
+  const left = daysLeft(x.paid_until || x.paidUntil);
+  if (left < 0) return ["warn", `просрочен ${-left} дн.`];
+  if (left <= 3) return ["warn", `осталось ${left} дн.`];
+  return [x.paid_ever ? "" : "trial", (x.paid_ever ? "до " : "пробный до ") + dmy(x.paid_until || x.paidUntil)];
+}
+function adminShopPage() {
+  const a = S.adminShop, head = `<div class="hero"><div class="top"><button class="admbtn" data-a="ashopclose">‹ Магазины</button><button class="admbtn" data-a="adminclose" aria-label="Закрыть">✕</button></div>`;
+  if (!a) return head + `<div class="big" style="font-size:20px">…</div></div><div class="spin" role="status"></div>`;
+  if (!a.shop) return head + `</div><div class="empty">Не найдено</div>`;
+  const x = a.shop, [k, t] = subStatus(x), p = a.price || 0;
+  return head + `<div class="big" style="font-size:20px">${esc(x.name)}</div><div style="margin-top:6px"><span class="pill ${k}" style="background:#fff">${t}</span></div></div>
+   <div class="adm">
+    <div class="box"><div class="kv"><span>Владелец</span><b>${esc(x.owner || "—")}</b></div><div class="kv"><span>Telegram ID</span><b class="num">${x.ownerId}</b></div><div class="kv"><span>Открыт</span><b>${dmy(x.created)}</b></div><div class="kv"><span>Оплачено до</span><b>${x.free ? "бесплатно" : dmy(x.paidUntil)}</b></div><div class="kv"><span>Карта для оплаты</span><b>${x.card ? "есть" : "нет"}</b></div></div>
+    <div class="box"><h3>Оплата получена</h3><div class="abtns"><button class="g" data-a="apay" data-v="1">+1 мес · ${fm(p)}</button><button class="g" data-a="apay" data-v="3">+3 мес · ${fm(p * 3)}</button></div>
+      <p style="margin:8px 0 0;color:var(--muted);font-size:12px">Продлевает от «оплачено до» (или от сегодня, если уже прошло), снимает блок и пишет владельцу.</p>
+      ${(a.payments || []).map(y => `<div class="kv"><span>${dmy(y.created_at)} · ${y.months} мес.</span><b class="num">${fm(y.amount)}</b></div>`).join("")}</div>
+    <div class="box"><h3>${x.blocked ? "Магазин заблокирован" : "Блокировка"}</h3>${x.blocked
+      ? `<p style="margin:0 0 8px;color:var(--muted);font-size:13px">С ${dmy(x.blockedAt)} · ${esc(x.reason || "подписка не оплачена")}</p><div class="abtns"><button class="o full" data-a="aunblock">Разблокировать без оплаты</button></div>`
+      : `<input class="inp" id="blkreason" placeholder="Причина (видит продавец)" value="${esc(S.blkReason ?? "Obuna to'lanmagan")}" maxlength="200"><div class="abtns" style="margin-top:8px"><button class="r full" data-a="ablock">Заблокировать</button></div>`}
+      <p style="margin:8px 0 0;color:var(--muted);font-size:12px">Данные не удаляются. Продавец не может записывать долги, напоминания его покупателям не уходят. Покупатели видят свой долг и могут оплатить.</p></div>
+    <div class="box"><h3>Бесплатно навсегда</h3><div class="abtns"><button class="o full" data-a="afree" data-v="${x.free ? 0 : 1}">${x.free ? "Сделать платным" : "Сделать бесплатным"}</button></div></div>
+    <div class="box"><h3>Написать владельцу</h3><div class="abtns"><button data-a="amsg" data-v="remind" class="full">Напомнить об оплате</button></div>
+      <textarea id="amsgtext" placeholder="Своё сообщение" maxlength="1000" style="margin-top:8px">${esc(S.amsg || "")}</textarea><div class="abtns" style="margin-top:8px"><button class="o full" data-a="amsg" data-v="text">Отправить</button></div></div>
+   </div>`;
+}
+async function openShop(id) { S.adminShopId = id; S.adminShop = null; S.blkReason = null; S.amsg = ""; render(); window.scrollTo(0, 0); const r = await api("adminShop", { id }); S.adminShop = r.error ? {} : r; render(); }
 function fmM(n) { n = Number(n) || 0; return n >= 1e6 ? (n / 1e6).toFixed(1).replace(".", ",") + " млн" : fm(n); }
 function ago(iso) { if (!iso) return "нет записей"; const d = Math.floor((Date.now() - Date.parse(iso)) / 864e5); return d <= 0 ? "сегодня" : d === 1 ? "вчера" : `${d} дн. назад`; }
 function adminPage() {
+  if (S.adminShopId) return adminShopPage();
   const s = S.admin && S.admin.stats;
   const head = `<div class="hero"><div class="top"><span class="shop">Админ · Nasiya Daftar</span><button class="admbtn" data-a="adminclose" aria-label="Закрыть">✕</button></div><div class="big" style="font-size:20px">Статистика</div></div>`;
   if (!S.admin) return head + `<div class="spin" role="status"></div>`;
@@ -396,7 +455,13 @@ function adminPage() {
     </div>
     <div class="box"><h3>Новые магазины, 14 дней</h3><div class="dchart" role="img" aria-label="Новые магазины по дням">${(s.daily || []).map((x, i) => `<div><em>${x.n || ""}</em><i style="height:${Math.max(3, x.n / dmax * 100)}%"></i><small>${i % 3 ? "" : x.day.slice(8, 10) + "." + x.day.slice(5, 7)}</small></div>`).join("")}</div></div>
     <div class="box fun"><h3>Воронка</h3>${fl.map((t, i) => `<div><span>${t}</span><i><b style="width:${(f[i] || 0) / fmax * 100}%"></b></i><b class="num">${f[i] || 0}</b></div>`).join("")}</div>
-    <div class="box"><h3>Магазины</h3>${(s.list || []).map(x => { const act = x.last && Date.now() - Date.parse(x.last) < 7 * 864e5; return `<div class="shoprow"><b>${esc(x.name)}</b><span class="pill ${act ? "" : "off"}">${act ? "активен" : "спит"}</span><small>${x.customers} покуп. · в боте ${x.linked} · долг ${fmM(x.debt)} · ${ago(x.last)}${x.card ? " · карта ✓" : ""}${x.auto ? "" : " · автонапом. выкл."}</small></div>`; }).join("") || `<div class="empty">Пока нет</div>`}</div>
+    <div class="kpis"><div class="kpi"><span>Платят сейчас</span><b class="num">${s.paying || 0}</b><small>по ${fm(s.price || 0)} сум/мес</small></div><div class="kpi"><span>Получено за 30 дн.</span><b class="num">${fmM(s.revenue30 || 0)}</b><small>сум</small></div></div>
+    <div class="box"><h3>Магазины</h3>${(s.list || []).map(x => { const act = x.last && Date.now() - Date.parse(x.last) < 7 * 864e5; const [k, t] = subStatus(x); return `<button class="shoprow" data-a="ashop" data-v="${x.id}"><b>${esc(x.name)}</b><span class="pill ${k}">${t}</span><small>${esc(x.owner || "")} · ${x.customers} покуп. · долг ${fmM(x.debt)} · ${act ? "активен" : "спит"}, ${ago(x.last)}${x.card ? " · карта ✓" : ""}</small></button>`; }).join("") || `<div class="empty">Пока нет</div>`}</div>
+    <div class="box"><h3>Настройки оплаты</h3>
+      <div class="kv"><span>Цена в месяц, сум</span><input class="inp num" id="aprice" inputmode="numeric" value="${s.price || 0}" style="max-width:130px;padding:7px 10px"></div>
+      <div class="kv"><span>Автоблок через 3 дня после окончания</span><button class="admbtn" style="color:var(--ink);border-color:var(--line);background:var(--bg)" data-a="aauto" data-v="${s.autoBlock ? 0 : 1}">${s.autoBlock ? "вкл ✓" : "выкл"}</button></div>
+      <div class="abtns" style="margin-top:8px"><button class="o full" data-a="aprice">Сохранить цену</button></div>
+      <p style="margin:8px 0 0;color:var(--muted);font-size:12px">За 3 дня и в день окончания бот сам предупреждает продавца. Новые магазины получают 30 дней бесплатно.</p></div>
     <p style="margin:0;color:var(--muted);font-size:12px">Тестовые магазины не учитываются. «Спит» — нет записей 7+ дней.</p>
   </div>`;
 }
@@ -407,7 +472,7 @@ function claimsBox() {
   if (cl.length) h += `<div class="claims" role="region" aria-label="${l.claimsTitle}"><h3>${l.claimsTitle} · ${cl.length}</h3>${cl.map(x => `<div class="claim"><div class="top"><b>${esc(x.name)}</b><span class="num">${fm(x.amount)} ${l.sum}</span></div>
     <small>${l.claimSaid} · ${when(x.at)}${d.shop.card ? " · " + esc(l.claimCheck(maskCard(d.shop.card))) : ""}</small>
     <div class="btns"><button class="ok" data-a="decide" data-v="${x.id}" data-ok="1" ${S.busy ? "disabled" : ""}>${l.cOk}</button><button class="no" data-a="decide" data-v="${x.id}" data-ok="0" ${S.busy ? "disabled" : ""}>${l.cNo}</button></div></div>`).join("")}</div>`;
-  if (!d.shop.card && d.customers.some(c => c.balance > 0)) h += `<div class="cardbanner"><span>${l.cardBanner}</span><button data-a="cardsheet">${l.cardAdd}</button></div>`;
+  if (!d.shop.card && !d.shop.blocked && d.customers.some(c => c.balance > 0)) h += `<div class="cardbanner"><span>${l.cardBanner}</span><button data-a="cardsheet">${l.cardAdd}</button></div>`;
   return h;
 }
 function report() {
@@ -419,6 +484,8 @@ function report() {
     <div class="box"><div class="kv"><span>${l.rTot}</span><b class="num">${fm(tot)} ${l.sum}</b></div><div class="kv"><span>${l.rDebtors}</span><b class="num">${cs.filter(c => c.balance > 0).length}</b></div><div class="kv"><span>${l.rClients}</span><b class="num">${cs.length}</b></div><div class="kv"><span>${l.rLinked}</span><b class="num">${cs.filter(c => c.linked).length}</b></div></div>
     <div class="box"><h3>${l.rWeek}</h3><div class="bars">${d.week.map(w => `<div class="bar" title="+${fm(w.debt)} / −${fm(w.pay)}"><div class="pair"><i class="d" style="height:${w.debt / max * 100}%"></i><i class="p" style="height:${w.pay / max * 100}%"></i></div><small>${l.wd[new Date(w.day + "T12:00:00").getDay()]}</small></div>`).join("")}</div>
       <div class="legend"><span><i style="background:var(--red)"></i>${l.lD}</span><span><i style="background:var(--green)"></i>${l.lP}</span></div></div>
+    <button class="ghost" data-a="excel" ${S.busy ? "disabled" : ""}>${l.excel}</button>
+    <div class="box"><h3>${l.subTitle}</h3><div class="kv"><span>${d.shop.blocked ? l.blkTitle : d.shop.free ? l.subFree : l.subUntil(dmy(d.shop.paidUntil))}</span><b class="num">${d.shop.free ? "" : l.subPrice(d.price || 0)}</b></div></div>
     <div class="box"><h3>${l.autoTitle}</h3><p style="margin:0;color:var(--muted);font-size:13px">${l.autoNote}</p>
       <div class="autochips" role="group" aria-label="${l.autoTitle}">${[3, 7, 14, 0].map(v => `<button data-a="setauto" data-v="${v}" aria-pressed="${(d.shop.auto || 0) === v}">${v ? l.every(v) : l.autoOffB}</button>`).join("")}</div></div>
     <div class="box"><h3>${l.cardTitle}</h3>${d.shop.card ? `<div class="kv"><span class="num">${fmtCard(d.shop.card)}</span><b>${cardBrand(d.shop.card)}</b></div>${d.shop.holder ? `<div class="kv"><span>${esc(d.shop.holder)}</span></div>` : ""}<p style="margin:6px 0 8px;color:var(--muted);font-size:13px">${l.cardNote}</p><button class="ghost" data-a="cardsheet">${l.cardChange}</button>` : `<p style="margin:0 0 8px;color:var(--muted);font-size:13px">${l.noCardOwner}. ${l.cardBanner}</p><button class="main" data-a="cardsheet">${l.cardAdd}</button>`}</div>
@@ -535,6 +602,7 @@ function syncBack() {
   if (S.sheet || S.view || S.adminOpen) tg.BackButton.show(); else tg.BackButton.hide();
 }
 function goBack() {
+  if (S.adminOpen && S.adminShopId && !S.sheet) { S.adminShopId = null; S.adminShop = null; render(); return; }
   if (S.adminOpen && !S.sheet) { S.adminOpen = false; render(); window.scrollTo(0, 0); return; }
   if (S.sheet) { S.sheet = null; renderLayer(); syncBack(); return; }
   if (S.view) { S.view = null; S.hist = null; render(); window.scrollTo(0, 0); }
@@ -623,7 +691,24 @@ document.addEventListener("click", async e => {
       toast(l.tRestored); await load();
     }); break;
     case "admin": openAdmin(); break;
-    case "adminclose": S.adminOpen = false; render(); window.scrollTo(0, 0); break;
+    case "adminclose": S.adminOpen = false; S.adminShopId = null; S.adminShop = null; render(); window.scrollTo(0, 0); break;
+    case "ashop": openShop(v); break;
+    case "excel": await run(async () => { const r = await api("export"); if (r.error) { toast(r.error === "empty" ? l.tExcelEmpty : errMsg(r), { err: true }); return; } toast(l.tExcel); }); break;
+    case "ashopclose": S.adminShopId = null; S.adminShop = null; render(); openAdmin(); break;
+    case "contact": if (tg && tg.openTelegramLink && /^https:\/\/t\.me\//.test(t.getAttribute("href"))) { e.preventDefault(); tg.openTelegramLink(t.getAttribute("href")); } break;
+    case "apay": case "ablock": case "aunblock": case "afree": case "amsg": {
+      const id = S.adminShopId; if (!id) break;
+      if (a === "ablock") S.blkReason = ($("#blkreason") || {}).value || "";
+      if ($("#amsgtext")) S.amsg = $("#amsgtext").value;
+      if (a === "amsg" && v === "text" && !S.amsg.trim()) { toast("Напишите текст", { err: true }); break; }
+      const map = { apay: ["adminPay", { id, months: Number(v) }, "Оплата записана, владелец получил сообщение"], ablock: ["adminBlock", { id, reason: S.blkReason }, "Магазин заблокирован, владелец получил сообщение"],
+        aunblock: ["adminUnblock", { id }, "Блок снят"], afree: ["adminFree", { id, free: v === "1" }, "Сохранено"], amsg: ["adminMsg", { id, kind: v, text: S.amsg }, "Сообщение отправлено владельцу"] };
+      const [act, body, ok] = map[a];
+      await run(async () => { const r = await api(act, body); if (r.error) { toast(r.error === "send" ? "Не удалось отправить — владелец мог заблокировать бота" : l.err, { err: true }); return; } if (a === "amsg" && v === "text") S.amsg = ""; toast(ok); const d = await api("adminShop", { id }); S.adminShop = d.error ? {} : d; render(); });
+      break;
+    }
+    case "aauto": await run(async () => { const r = await api("adminSettings", { autoBlock: v === "1" }); if (r.error) { toast(l.err, { err: true }); return; } toast(v === "1" ? "Автоблок включён" : "Автоблок выключен"); S.admin.stats.autoBlock = r.autoBlock; render(); }); break;
+    case "aprice": await run(async () => { const p = Number(($("#aprice") || {}).value); if (!Number.isInteger(p) || p < 0) { toast("Цена — целое число", { err: true }); return; } const r = await api("adminSettings", { price: p }); if (r.error) { toast(l.err, { err: true }); return; } S.admin.stats.price = r.price; toast("Цена сохранена"); render(); }); break;
     case "setauto": await run(async () => {
       const r = await api("setAuto", { days: Number(v) });
       if (r.error) { toast(errMsg(r), { err: true }); return; }
