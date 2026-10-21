@@ -145,6 +145,25 @@ button{cursor:pointer}
 .toast.err{background:var(--red);color:#fff}
 .toast button{border:0;background:rgba(255,255,255,.2);color:inherit;border-radius:8px;padding:4px 10px;font-weight:700}
 .card-list{padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.claims{margin:12px 16px 0;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+.claims h3{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.claim{display:flex;flex-direction:column;gap:8px}
+.claim .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.claim .top b{min-width:0;overflow-wrap:anywhere}
+.claim .top .num{color:var(--green);font-weight:700;white-space:nowrap}
+.claim small{color:var(--muted)}
+.claim .btns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.claim .btns button{border:0;border-radius:10px;padding:10px;font-weight:700}
+.claim .ok{background:var(--green);color:#fff} .claim .no{background:var(--red-soft);color:var(--red)}
+.cardbanner{margin:12px 16px 0;display:flex;gap:10px;align-items:center;background:var(--blue-soft);color:var(--blue);border-radius:14px;padding:10px 12px;font-size:13px;font-weight:600}
+.cardbanner span{flex:1;min-width:0}
+.cardbanner button{border:0;background:var(--blue);color:#fff;border-radius:10px;padding:8px 10px;font-weight:700;white-space:nowrap}
+.cardno{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:20px;font-weight:700;letter-spacing:1px;text-align:center;background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:12px;user-select:all;overflow-wrap:anywhere}
+.cardsub{text-align:center;color:var(--muted);font-size:13px;margin-top:-4px}
+.warn{background:#FFF4D6;color:#7A5600;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600}
+:root[data-theme="dark"] .warn{background:#3A3018;color:#E8C26A}
+.paybtn{border:0;border-radius:10px;padding:10px;font-weight:700;background:var(--green);color:#fff;width:100%;margin-top:8px}
+.pend{margin-top:8px;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){ .sheet{animation:up .2s ease-out} @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}} }
 </style>
 </head>
@@ -164,6 +183,10 @@ const initials = n => String(n).trim().split(/\s+/).map(w => w[0] || "").join(""
 const colorOf = id => COLORS[[...String(id)].reduce((a, ch) => a + ch.charCodeAt(0), 0) % COLORS.length];
 function fmtPhone(p) { if (!p) return ""; const m = p.match(/^\+998(\d{2})(\d{3})(\d{2})(\d{2})$/); return m ? `+998 ${m[1]} ${m[2]} ${m[3]} ${m[4]}` : p; }
 function normPhone(raw) { const plus = raw.trim().startsWith("+"); let d = raw.replace(/\D/g, ""); if (!plus && d.length === 9) d = "998" + d; if (d.startsWith("998") && d.length === 12) return "+" + d; if (plus && d.length >= 10 && d.length <= 15) return "+" + d; return null; }
+const CARD_RE = /^(8600|5614|9860)\d{12}$/;
+const fmtCard = c => String(c || "").replace(/(\d{4})(?=\d)/g, "$1 ");
+const maskCard = c => c ? c.slice(0, 4) + " •••• " + c.slice(-4) : "";
+const cardBrand = c => String(c || "").startsWith("9860") ? "Humo" : "Uzcard";
 function when(iso) { const d = new Date(iso); return String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0") + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
 
 const T = {
@@ -186,6 +209,12 @@ const T = {
     noTg: "Bu ilova Telegram ichida ochiladi", noTgSub: "Botni oching va pastdagi «Ilova» tugmasini bosing.", openBot: "Botni ochish",
     newShop: "Do'koningizni oching", newShopSub: "Nasiyani shu yerga yozasiz, xaridorga Telegram orqali xabar boradi.", shopPh: "Do'kon nomi", create: "Do'kon ochish",
     myTitle: "Qarzlaringiz", myHist: "Tarix", nothing: "Hali yozuv yo'q",
+    payBtn: "To'lash", payTitle: "Kartaga o'tkazish", payHint: "Click, Payme yoki bank ilovasi orqali o'tkazing, keyin pastdagi tugmani bosing.", payWarn: "Pulni faqat shu kartaga o'tkazing.",
+    copyCard: "Raqamni nusxalash", tCardCopied: "Karta raqami nusxalandi", paidBtn: a => `To'ladim · ${fm(a)} so'm`, tClaim: "So'rov yuborildi. Do'kon tasdiqlashini kuting",
+    pendingTxt: a => `${fm(a)} so'm — do'kon tasdiqlashini kutmoqda`, noCardC: "Do'kon hali karta qo'shmagan", tPending: "Avvalgi so'rov hali tasdiqlanmagan", tNoDebt: "Qarzingiz yo'q",
+    claimsTitle: "Tasdiqlash kutilmoqda", claimSaid: "o'tkazganini aytdi", claimCheck: c => `Kartangizni tekshiring (${c})`, cOk: "Tasdiqlash ✓", cNo: "Kelmadi", tOk: "To'lov yozildi", tNo: "Belgilandi: pul kelmadi", tGone: "So'rov allaqachon ko'rib chiqilgan",
+    cardBanner: "Karta qo'shing — xaridorlar qarzni botdan to'laydi", cardAdd: "Karta qo'shish", cardTitle: "To'lov kartasi", cardPh: "8600 0000 0000 0000", holderPh: "Karta egasi (masalan: Akmal T.)",
+    badCard: "Karta raqami 16 ta raqam (8600…, 5614… yoki 9860…)", tCard: "Karta saqlandi", cardRemove: "Kartani o'chirish", tCardRm: "Karta o'chirildi", cardChange: "O'zgartirish", cardNote: "Xaridorlar shu kartaga o'tkazadi, har bir to'lovni siz tasdiqlaysiz.", noCardOwner: "Karta qo'shilmagan",
   },
   ru: {
     total: "Всего в долг", sum: "сум", debtors: "должников", today: "записано сегодня", paid: "оплачено сегодня",
@@ -206,6 +235,12 @@ const T = {
     noTg: "Это приложение открывается внутри Telegram", noTgSub: "Откройте бота и нажмите кнопку «Ilova» внизу.", openBot: "Открыть бота",
     newShop: "Откройте свой магазин", newShopSub: "Записывайте долги здесь, покупатель получит сообщение в Telegram.", shopPh: "Название магазина", create: "Открыть магазин",
     myTitle: "Ваши долги", myHist: "История", nothing: "Записей пока нет",
+    payBtn: "Оплатить", payTitle: "Перевод на карту", payHint: "Переведите через Click, Payme или приложение банка, затем нажмите кнопку ниже.", payWarn: "Переводите только на эту карту.",
+    copyCard: "Скопировать номер", tCardCopied: "Номер карты скопирован", paidBtn: a => `Я оплатил · ${fm(a)} сум`, tClaim: "Заявка отправлена. Ждите подтверждения магазина",
+    pendingTxt: a => `${fm(a)} сум — ждёт подтверждения магазина`, noCardC: "Магазин ещё не добавил карту", tPending: "Предыдущая заявка ещё не подтверждена", tNoDebt: "У вас нет долга",
+    claimsTitle: "Ждут подтверждения", claimSaid: "сообщает о переводе", claimCheck: c => `Проверьте карту (${c})`, cOk: "Подтвердить ✓", cNo: "Не пришло", tOk: "Оплата записана", tNo: "Отмечено: деньги не пришли", tGone: "Заявка уже рассмотрена",
+    cardBanner: "Добавьте карту — покупатели будут платить долг из бота", cardAdd: "Добавить карту", cardTitle: "Карта для оплаты", cardPh: "8600 0000 0000 0000", holderPh: "Владелец карты (например: Akmal T.)",
+    badCard: "Номер карты — 16 цифр (8600…, 5614… или 9860…)", tCard: "Карта сохранена", cardRemove: "Удалить карту", tCardRm: "Карта удалена", cardChange: "Изменить", cardNote: "Покупатели переводят на эту карту, каждую оплату подтверждаете вы.", noCardOwner: "Карта не добавлена",
   },
 };
 
@@ -259,6 +294,12 @@ function errMsg(r) {
   if (r.error === "badName") return l.badName;
   if (r.error === "remSoon") return l.tRemSoon(r.hours || 1);
   if (r.error === "notLinked") return l.tNotLinked;
+  if (r.error === "badCard") return l.badCard;
+  if (r.error === "pending") return l.tPending;
+  if (r.error === "noDebt") return l.tNoDebt;
+  if (r.error === "noCard") return l.noCardC;
+  if (r.error === "badAmount") return l.tooMuch(r.max || 0);
+  if (r.error === "gone") return l.tGone;
   return l.err;
 }
 
@@ -284,6 +325,7 @@ function home() {
   const head = `<div class="hero"><div class="top"><span class="shop">${esc(d.shop.name)}</span>${langSw()}</div>
     <div class="big num">${fm(tot)} <span>${l.sum}</span></div>
     <div class="stats"><div class="stat"><b class="num">${cs.filter(c => c.balance > 0).length}</b><span>${l.debtors}</span></div><div class="stat"><b class="num">+${fm(today.debt)}</b><span>${l.today}</span></div><div class="stat"><b class="num">−${fm(today.pay)}</b><span>${l.paid}</span></div></div></div>
+    ${claimsBox()}
     <div class="tabs" role="tablist"><button role="tab" data-a="tab" data-v="cust" aria-selected="${S.tab === "cust"}">${l.tCust}</button><button role="tab" data-a="tab" data-v="rep" aria-selected="${S.tab === "rep"}">${l.tRep}</button></div>`;
   if (S.tab === "rep") return head + report();
   const q = S.q.trim().toLowerCase(), qd = q.replace(/\D/g, "");
@@ -302,6 +344,15 @@ function home() {
     <div class="list">${body}</div>
     <button class="fab" data-a="sheet" data-v="debt">${l.fab}</button>`;
 }
+function claimsBox() {
+  const d = S.data, l = L(), cl = d.claims || [];
+  let h = "";
+  if (cl.length) h += `<div class="claims" role="region" aria-label="${l.claimsTitle}"><h3>${l.claimsTitle} · ${cl.length}</h3>${cl.map(x => `<div class="claim"><div class="top"><b>${esc(x.name)}</b><span class="num">${fm(x.amount)} ${l.sum}</span></div>
+    <small>${l.claimSaid} · ${when(x.at)}${d.shop.card ? " · " + esc(l.claimCheck(maskCard(d.shop.card))) : ""}</small>
+    <div class="btns"><button class="ok" data-a="decide" data-v="${x.id}" data-ok="1" ${S.busy ? "disabled" : ""}>${l.cOk}</button><button class="no" data-a="decide" data-v="${x.id}" data-ok="0" ${S.busy ? "disabled" : ""}>${l.cNo}</button></div></div>`).join("")}</div>`;
+  if (!d.shop.card && d.customers.some(c => c.balance > 0)) h += `<div class="cardbanner"><span>${l.cardBanner}</span><button data-a="cardsheet">${l.cardAdd}</button></div>`;
+  return h;
+}
 function report() {
   const d = S.data, l = L(), cs = d.customers;
   const tot = cs.reduce((s, c) => s + Math.max(0, c.balance), 0);
@@ -311,6 +362,7 @@ function report() {
     <div class="box"><div class="kv"><span>${l.rTot}</span><b class="num">${fm(tot)} ${l.sum}</b></div><div class="kv"><span>${l.rDebtors}</span><b class="num">${cs.filter(c => c.balance > 0).length}</b></div><div class="kv"><span>${l.rClients}</span><b class="num">${cs.length}</b></div><div class="kv"><span>${l.rLinked}</span><b class="num">${cs.filter(c => c.linked).length}</b></div></div>
     <div class="box"><h3>${l.rWeek}</h3><div class="bars">${d.week.map(w => `<div class="bar" title="+${fm(w.debt)} / −${fm(w.pay)}"><div class="pair"><i class="d" style="height:${w.debt / max * 100}%"></i><i class="p" style="height:${w.pay / max * 100}%"></i></div><small>${l.wd[new Date(w.day + "T12:00:00").getDay()]}</small></div>`).join("")}</div>
       <div class="legend"><span><i style="background:var(--red)"></i>${l.lD}</span><span><i style="background:var(--green)"></i>${l.lP}</span></div></div>
+    <div class="box"><h3>${l.cardTitle}</h3>${d.shop.card ? `<div class="kv"><span class="num">${fmtCard(d.shop.card)}</span><b>${cardBrand(d.shop.card)}</b></div>${d.shop.holder ? `<div class="kv"><span>${esc(d.shop.holder)}</span></div>` : ""}<p style="margin:6px 0 8px;color:var(--muted);font-size:13px">${l.cardNote}</p><button class="ghost" data-a="cardsheet">${l.cardChange}</button>` : `<p style="margin:0 0 8px;color:var(--muted);font-size:13px">${l.noCardOwner}. ${l.cardBanner}</p><button class="main" data-a="cardsheet">${l.cardAdd}</button>`}</div>
     <div class="box"><h3>${l.rLate}</h3>${late.length ? late.map(c => `<div class="kv"><span>${esc(c.name)} · ${l.days(c.days)}</span><b class="num" style="color:var(--red)">${fm(c.balance)}</b></div>`).join("") : `<span style="color:var(--muted)">${l.rNoLate}</span>`}</div>
   </div>`;
 }
@@ -332,13 +384,34 @@ function custView() {
 function customerPage() {
   const d = S.data, l = L();
   return `<div class="hero"><div class="top"><span class="shop">Nasiya Daftar</span>${langSw()}</div><div class="big" style="font-size:22px">${l.myTitle}</div></div>
-   <div class="card-list">${d.mine.map(m => `<div class="box"><div class="kv"><span>${esc(m.shop)}</span><b class="num" style="color:${m.balance > 0 ? "var(--red)" : "var(--green)"}">${fm(m.balance)} ${l.sum}</b></div></div>`).join("")}</div>
+   <div class="card-list">${d.mine.map(m => `<div class="box"><div class="kv"><span>${esc(m.shop)}</span><b class="num" style="color:${m.balance > 0 ? "var(--red)" : "var(--green)"}">${fm(m.balance)} ${l.sum}</b></div>${m.balance > 0 ? (m.pending ? `<div class="pend">⏳ ${l.pendingTxt(m.pending)}</div>` : m.card ? `<button class="paybtn" data-a="cpay" data-v="${m.cid}">${l.payBtn}</button>` : `<div class="pend">${l.noCardC}</div>`) : ""}</div>`).join("")}</div>
    <div class="sec">${l.myHist}</div>
    <div class="hist">${d.history.length ? d.history.map(o => `<div class="h"><div class="t"><b>${o.kind === "debt" ? esc(o.note || l.noNote) : l.pay}</b><small class="num">${when(o.at)}${d.mine.length > 1 ? " · " + esc(o.shop) : ""}</small></div><span class="v num ${o.kind === "debt" ? "d" : "p"}">${o.kind === "debt" ? "+" : "−"}${fm(o.amount)}</span><span></span></div>`).join("") : `<div class="empty">${l.nothing}</div>`}</div>`;
 }
 
 function sheetView() {
   const l = L(), sh = S.sheet;
+  if (sh.kind === "card") {
+    return `<div class="sheet" role="dialog" aria-label="${l.cardTitle}"><div class="grab"></div><h3>${l.cardTitle}</h3><p style="margin:0;color:var(--muted);font-size:13px">${l.cardNote}</p>
+      <input class="inp num" id="cardinp" inputmode="numeric" placeholder="${l.cardPh}" value="${esc(sh.card ?? fmtCard(S.data.shop.card))}" maxlength="23" autocomplete="off">
+      <input class="inp" id="holderinp" placeholder="${l.holderPh}" value="${esc(sh.holder ?? (S.data.shop.holder || ""))}" maxlength="40" autocomplete="off"><div class="err">${esc(sh.err || "")}</div>
+      <button class="main" data-a="savecard" ${S.busy ? "disabled" : ""}>${l.save}</button>${S.data.shop.card ? `<button class="ghost" data-a="rmcard" style="color:var(--red)" ${S.busy ? "disabled" : ""}>${l.cardRemove}</button>` : ""}</div>`;
+  }
+  if (sh.kind === "cpay") {
+    const m = (S.data.mine || []).find(x => x.cid === sh.cid);
+    if (!m) return "";
+    const a = Number(sh.amt || 0), b = m.balance;
+    const err = sh.err || (a > b ? l.tooMuch(b) : "");
+    return `<div class="sheet" role="dialog" aria-label="${l.payTitle}"><div class="grab"></div><h3>${l.payTitle}</h3><div class="who">${esc(m.shop)} · ${fm(b)} ${l.sum}</div>
+      <div class="cardno" id="cardno">${fmtCard(m.card)}</div><div class="cardsub">${cardBrand(m.card)}${m.holder ? " · " + esc(m.holder) : ""}</div>
+      <button class="ghost" data-a="copycard" data-v="${m.card}">${l.copyCard}</button>
+      <div class="warn">${l.payWarn}</div><p style="margin:0;color:var(--muted);font-size:13px">${l.payHint}</p>
+      <div class="amount num p">${a ? fm(a) : "0"} <span>${l.sum}</span></div>
+      <div class="quick"><button data-a="quick" data-v="${b}">${l.all}</button></div>
+      <div class="pad">${["1", "2", "3", "4", "5", "6", "7", "8", "9", "000", "0", "⌫"].map(k => `<button data-a="key" data-v="${k}" aria-label="${k === "⌫" ? "Delete" : k}">${k}</button>`).join("")}</div>
+      <div class="err">${esc(err)}</div>
+      <button class="main p" data-a="claimpay" ${a > 0 && a <= b && !S.busy ? "" : "disabled"}>${a > 0 ? l.paidBtn(a) : l.enter}</button></div>`;
+  }
   if (sh.kind === "phone") {
     const c = S.hist.customer;
     return `<div class="sheet" role="dialog" aria-label="${l.phoneTitle}"><div class="grab"></div><h3>${l.phoneTitle}</h3><div class="who">${esc(c.name)}</div>
@@ -388,9 +461,9 @@ function render() {
 }
 function renderLayer() {
   const keep = {};
-  ["note", "newname", "newphone", "phoneinp"].forEach(id => { const el = $("#" + id); if (el) keep[id] = el.value; });
+  ["note", "newname", "newphone", "phoneinp", "cardinp", "holderinp"].forEach(id => { const el = $("#" + id); if (el) keep[id] = el.value; });
   let html = "";
-  if (S.sheet && S.data && S.data.role === "owner") html += `<div class="scrim" data-a="close"></div>` + sheetView();
+  if (S.sheet && S.data && (S.data.role === "owner" || S.sheet.kind === "cpay")) html += `<div class="scrim" data-a="close"></div>` + sheetView();
   if (S.toast) html += `<div class="toast ${S.toast.err ? "err" : ""}" role="status"><span>${esc(S.toast.msg)}</span>${S.toast.action ? `<button data-a="${S.toast.action}" data-v="${esc(S.toast.v || "")}">${esc(S.toast.label)}</button>` : ""}</div>`;
   $("#layer").innerHTML = html;
   Object.entries(keep).forEach(([id, v]) => { const el = $("#" + id); if (el && !el.value) el.value = v; });
@@ -411,6 +484,8 @@ function readSheetInputs() {
   if ($("#newname")) sh.nn = $("#newname").value;
   if ($("#newphone")) sh.np = $("#newphone").value;
   if ($("#phoneinp")) sh.val = $("#phoneinp").value;
+  if ($("#cardinp")) sh.card = $("#cardinp").value;
+  if ($("#holderinp")) sh.holder = $("#holderinp").value;
 }
 async function run(fn) { if (S.busy) return; S.busy = true; renderLayer(); try { await fn(); } finally { S.busy = false; renderLayer(); } }
 
@@ -483,6 +558,34 @@ document.addEventListener("click", async e => {
       const r = await api("restore", { cid: v });
       if (r.error) { toast(errMsg(r), { err: true }); return; }
       toast(l.tRestored); await load();
+    }); break;
+    case "cardsheet": S.sheet = { kind: "card" }; renderLayer(); syncBack(); break;
+    case "savecard": await run(async () => {
+      const sh = S.sheet, d = String(sh.card || "").replace(/[\s-]/g, "");
+      if (!CARD_RE.test(d)) { sh.err = l.badCard; return; }
+      const r = await api("setCard", { card: d, holder: (sh.holder || "").trim() });
+      if (r.error) { sh.err = errMsg(r); return; }
+      S.sheet = null; toast(l.tCard); await load();
+    }); break;
+    case "rmcard": await run(async () => {
+      const r = await api("removeCard");
+      if (r.error) { toast(errMsg(r), { err: true }); return; }
+      S.sheet = null; toast(l.tCardRm); await load();
+    }); break;
+    case "decide": await run(async () => {
+      const ok = t.dataset.ok === "1";
+      const r = await api("decideClaim", { id: v, ok });
+      if (r.error) toast(errMsg(r), { err: true });
+      else toast(ok ? (r.status === "noDebt" ? l.tGone : l.tOk) : l.tNo, ok && r.entryId ? { action: "undoLast", v: r.entryId, label: l.undo } : {});
+      await load();
+    }); break;
+    case "cpay": S.sheet = { kind: "cpay", cid: v, amt: "" }; renderLayer(); syncBack(); break;
+    case "copycard": try { await navigator.clipboard.writeText(v); toast(l.tCardCopied); } catch (_) { const el = $("#cardno"); if (el) window.getSelection().selectAllChildren(el); } break;
+    case "claimpay": await run(async () => {
+      const sh = S.sheet, n = Number(sh.amt);
+      const r = await api("payClaim", { cid: sh.cid, amount: n });
+      if (r.error) { sh.err = errMsg(r); if (r.error === "pending") { S.sheet = null; toast(l.tPending, { err: true }); await load(); } return; }
+      S.sheet = null; toast(l.tClaim); await load();
     }); break;
     case "createShop": {
       const name = ($("#shopname").value || "").trim();
