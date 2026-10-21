@@ -192,7 +192,7 @@ function when(iso) { const d = new Date(iso); return String(d.getDate()).padStar
 const T = {
   uz: {
     total: "Jami nasiya", sum: "so'm", debtors: "qarzdor", today: "bugun yozildi", paid: "bugun to'landi",
-    tCust: "Mijozlar", tRep: "Hisobot", search: "Ism yoki telefon", fAll: "Hammasi", fDebt: "Qarzdorlar", fLate: "14+ kun", fOff: "Botga ulanmagan",
+    tCust: "Mijozlar", tRep: "Hisobot", tMy: "Qarzlarim", search: "Ism yoki telefon", fAll: "Hammasi", fDebt: "Qarzdorlar", fLate: "14+ kun", fOff: "Botga ulanmagan",
     days: d => `${d} kun`, noPay: "to'lovsiz", last: "oxirgi", offline: "botda yo'q", none: "Hech kim topilmadi", noClients: "Hali mijoz yo'q. Pastdagi tugma bilan birinchi qarzni yozing.",
     fab: "+ Qarz yozish", aDebt: "Qarz", aPay: "To'lov", aRem: "Eslatma", aInv: "Havola", aPhone: "Telefon", aDel: "O'chirish",
     hist: "Tarix", undo: "bekor qilish", pay: "to'lov", noNote: "izohsiz", linked: "Telegram ulangan ✓", notLinked: "Telegram ulanmagan", zero: "Qarzi yo'q",
@@ -218,7 +218,7 @@ const T = {
   },
   ru: {
     total: "Всего в долг", sum: "сум", debtors: "должников", today: "записано сегодня", paid: "оплачено сегодня",
-    tCust: "Покупатели", tRep: "Отчёт", search: "Имя или телефон", fAll: "Все", fDebt: "Должники", fLate: "14+ дней", fOff: "Не в боте",
+    tCust: "Покупатели", tRep: "Отчёт", tMy: "Мои долги", search: "Имя или телефон", fAll: "Все", fDebt: "Должники", fLate: "14+ дней", fOff: "Не в боте",
     days: d => `${d} дн.`, noPay: "без оплаты", last: "последняя", offline: "не в боте", none: "Никого не нашлось", noClients: "Покупателей пока нет. Запишите первый долг кнопкой внизу.",
     fab: "+ Записать долг", aDebt: "Долг", aPay: "Оплата", aRem: "Напомнить", aInv: "Ссылка", aPhone: "Телефон", aDel: "Удалить",
     hist: "История", undo: "отменить", pay: "оплата", noNote: "без комментария", linked: "Telegram подключён ✓", notLinked: "Telegram не подключён", zero: "Долга нет",
@@ -322,12 +322,14 @@ function home() {
   const d = S.data, l = L(), cs = d.customers;
   const tot = cs.reduce((s, c) => s + Math.max(0, c.balance), 0);
   const today = d.week[d.week.length - 1] || { debt: 0, pay: 0 };
+  const hasMy = !!(d.mine && d.mine.length), myDue = hasMy && d.mine.some(m => m.balance > 0);
   const head = `<div class="hero"><div class="top"><span class="shop">${esc(d.shop.name)}</span>${langSw()}</div>
     <div class="big num">${fm(tot)} <span>${l.sum}</span></div>
     <div class="stats"><div class="stat"><b class="num">${cs.filter(c => c.balance > 0).length}</b><span>${l.debtors}</span></div><div class="stat"><b class="num">+${fm(today.debt)}</b><span>${l.today}</span></div><div class="stat"><b class="num">−${fm(today.pay)}</b><span>${l.paid}</span></div></div></div>
     ${claimsBox()}
-    <div class="tabs" role="tablist"><button role="tab" data-a="tab" data-v="cust" aria-selected="${S.tab === "cust"}">${l.tCust}</button><button role="tab" data-a="tab" data-v="rep" aria-selected="${S.tab === "rep"}">${l.tRep}</button></div>`;
+    <div class="tabs" role="tablist"><button role="tab" data-a="tab" data-v="cust" aria-selected="${S.tab === "cust"}">${l.tCust}</button><button role="tab" data-a="tab" data-v="rep" aria-selected="${S.tab === "rep"}">${l.tRep}</button>${hasMy ? `<button role="tab" data-a="tab" data-v="my" aria-selected="${S.tab === "my"}">${l.tMy}${myDue ? ` <span class="num" style="color:var(--red)">·</span>` : ""}</button>` : ""}</div>`;
   if (S.tab === "rep") return head + report();
+  if (S.tab === "my" && hasMy) return head + myBody();
   const q = S.q.trim().toLowerCase(), qd = q.replace(/\D/g, "");
   let list = cs.filter(c => !q || c.name.toLowerCase().includes(q) || (qd.length >= 3 && (c.phone || "").includes(qd)));
   if (S.filter === "debt") list = list.filter(c => c.balance > 0);
@@ -383,8 +385,11 @@ function custView() {
 }
 function customerPage() {
   const d = S.data, l = L();
-  return `<div class="hero"><div class="top"><span class="shop">Nasiya Daftar</span>${langSw()}</div><div class="big" style="font-size:22px">${l.myTitle}</div></div>
-   <div class="card-list">${d.mine.map(m => `<div class="box"><div class="kv"><span>${esc(m.shop)}</span><b class="num" style="color:${m.balance > 0 ? "var(--red)" : "var(--green)"}">${fm(m.balance)} ${l.sum}</b></div>${m.balance > 0 ? (m.pending ? `<div class="pend">⏳ ${l.pendingTxt(m.pending)}</div>` : m.card ? `<button class="paybtn" data-a="cpay" data-v="${m.cid}">${l.payBtn}</button>` : `<div class="pend">${l.noCardC}</div>`) : ""}</div>`).join("")}</div>
+  return `<div class="hero"><div class="top"><span class="shop">Nasiya Daftar</span>${langSw()}</div><div class="big" style="font-size:22px">${l.myTitle}</div></div>` + myBody();
+}
+function myBody() {
+  const d = S.data, l = L();
+  return `<div class="card-list">${d.mine.map(m => `<div class="box"><div class="kv"><span>${esc(m.shop)}</span><b class="num" style="color:${m.balance > 0 ? "var(--red)" : "var(--green)"}">${fm(m.balance)} ${l.sum}</b></div>${m.balance > 0 ? (m.pending ? `<div class="pend">⏳ ${l.pendingTxt(m.pending)}</div>` : m.card ? `<button class="paybtn" data-a="cpay" data-v="${m.cid}">${l.payBtn}</button>` : `<div class="pend">${l.noCardC}</div>`) : ""}</div>`).join("")}</div>
    <div class="sec">${l.myHist}</div>
    <div class="hist">${d.history.length ? d.history.map(o => `<div class="h"><div class="t"><b>${o.kind === "debt" ? esc(o.note || l.noNote) : l.pay}</b><small class="num">${when(o.at)}${d.mine.length > 1 ? " · " + esc(o.shop) : ""}</small></div><span class="v num ${o.kind === "debt" ? "d" : "p"}">${o.kind === "debt" ? "+" : "−"}${fm(o.amount)}</span><span></span></div>`).join("") : `<div class="empty">${l.nothing}</div>`}</div>`;
 }
