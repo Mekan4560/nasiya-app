@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#2B4C9B">
+<title>Nasiya Daftar</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
+<style>
+:root{
+  --bg:#F1F3F8; --card:#FFFFFF; --ink:#1B2440; --muted:#6A7390; --line:#E3E7F0;
+  --blue:#2B4C9B; --blue-soft:#E4EAF8; --red:#C8443B; --red-soft:#FBE7E5; --green:#1F8A5B; --green-soft:#E1F4EA;
+  --hero:#2B4C9B; --grid:rgba(255,255,255,.09); --scrim:rgba(15,20,40,.45);
+  --display:"Unbounded","Arial Black",sans-serif; --body:"Onest",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#0F1426; --card:#192038; --ink:#E8ECF6; --muted:#9AA4C0; --line:#28314F;
+  --blue:#7FA0F0; --blue-soft:#24305A; --red:#F08077; --red-soft:#3A2024; --green:#5CCB95; --green-soft:#173327;
+  --hero:#22356B; --grid:rgba(255,255,255,.06); --scrim:rgba(0,0,0,.6); color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.4;overscroll-behavior:none}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+#app{min-height:100%;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+
+.hero{background:var(--hero);color:#fff;padding:16px 16px 18px;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:18px 18px}
+.hero .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hero small{opacity:.85;font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+.hero .shop{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lang{display:flex;background:rgba(255,255,255,.14);border-radius:999px;padding:2px;flex:none}
+.lang button{border:0;background:none;color:#fff;font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px}
+.lang button[aria-pressed="true"]{background:#fff;color:#22356B}
+.hero .big{font-family:var(--display);font-size:30px;line-height:1.15;margin:10px 0 12px}
+.hero .big span{font-family:var(--body);font-size:15px;font-weight:600;opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 10px;min-width:0}
+.stat b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat span{font-size:11px;opacity:.85}
+
+.tabs{display:flex;gap:6px;padding:12px 16px 4px}
+.tabs button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px;font-weight:600;font-size:14px}
+.tabs button[aria-selected="true"]{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.search{margin:10px 16px 6px;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 12px;color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;background:none;padding:10px 0;outline:none;color:var(--ink)}
+.chips{display:flex;gap:6px;padding:4px 16px 8px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+
+.list{padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:left;width:100%}
+.ava{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700}
+.row .t{min-width:0}
+.row .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .t small{color:var(--muted);font-size:12px}
+.amt{font-weight:700;text-align:right}
+.amt.d{color:var(--red)} .amt.z{color:var(--green)}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--red-soft);color:var(--red);margin-left:4px}
+.empty{text-align:center;color:var(--muted);padding:30px 16px}
+.fab{position:fixed;left:16px;right:16px;bottom:calc(14px + env(safe-area-inset-bottom));border:0;background:var(--blue);color:#fff;border-radius:14px;padding:14px;font-weight:700;font-size:16px;box-shadow:0 6px 18px rgba(27,36,64,.25);z-index:4}
+
+.cust-head{padding:18px 16px;background:var(--card);border-bottom:1px solid var(--line);text-align:center}
+.cust-head .ava{width:56px;height:56px;margin:0 auto 8px;font-size:20px}
+.cust-head h2{margin:0;font-size:19px;overflow-wrap:anywhere}
+.cust-head .ph{color:var(--muted);font-size:14px;margin-top:2px}
+.cust-head .bal{font-family:var(--display);font-size:26px;margin-top:8px}
+.cust-head .bal.d{color:var(--red)} .cust-head .bal.z{color:var(--green)}
+.cust-head small{color:var(--muted)}
+.acts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 16px 6px}
+.acts button,.acts2 button{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 4px;font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:4px}
+.acts button svg{width:20px;height:20px}
+.acts .a-debt{color:var(--red)} .acts .a-pay{color:var(--green)} .acts .a-rem,.acts .a-inv{color:var(--blue)}
+.acts button:disabled{opacity:.4;cursor:default}
+.acts2{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 10px}
+.acts2 button{flex-direction:row;justify-content:center;padding:9px}
+.acts2 .del{color:var(--red)}
+.sec{padding:6px 16px 4px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.hist{padding:4px 16px 24px;display:flex;flex-direction:column;gap:6px}
+.h{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+.h.off{opacity:.45}
+.h.off .v,.h.off b{text-decoration:line-through}
+.h .t{min-width:0}
+.h .t b{font-size:14px;display:block;overflow-wrap:anywhere}
+.h .t small{color:var(--muted);font-size:12px}
+.h .v{font-weight:700}
+.h .v.d{color:var(--red)} .h .v.p{color:var(--green)}
+.h button{border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;padding:4px}
+
+.rep{padding:8px 16px;display:flex;flex-direction:column;gap:10px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.box h3{margin:0 0 8px;font-size:14px}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--muted);min-width:0;overflow-wrap:anywhere}
+.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:120px;margin-top:6px}
+.bar{display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end}
+.bar .pair{display:flex;gap:2px;align-items:flex-end;height:100px}
+.bar i{display:block;width:9px;border-radius:3px 3px 0 0;min-height:1px}
+.bar i.d{background:var(--red)} .bar i.p{background:var(--green)}
+.bar small{font-size:10px;color:var(--muted)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:8}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:9;background:var(--card);border-radius:20px 20px 0 0;padding:10px 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;max-height:92%;overflow-y:auto;max-width:640px;margin:0 auto}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 4px}
+.sheet h3{margin:0;font-size:17px}
+.sheet .who{color:var(--muted);font-size:13px}
+.amount{font-family:var(--display);font-size:34px;text-align:center;padding:6px 0;min-height:52px}
+.amount.d{color:var(--red)} .amount.p{color:var(--green)}
+.amount span{font-family:var(--body);font-size:15px;color:var(--muted)}
+.quick{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.quick button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pad button{border:0;background:var(--bg);border-radius:12px;padding:12px;font-size:20px;font-weight:600}
+.inp{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;width:100%;outline:none}
+.inp:focus{border-color:var(--blue)}
+.err{color:var(--red);font-size:13px;min-height:18px}
+.main{border:0;border-radius:14px;padding:14px;font-weight:700;font-size:16px;color:#fff;background:var(--blue);width:100%}
+.main.d{background:var(--red)} .main.p{background:var(--green)}
+.main:disabled{opacity:.45;cursor:default}
+.ghost{border:1px solid var(--line);border-radius:14px;padding:12px;font-weight:600;background:var(--card);width:100%}
+.picklist{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto}
+.picklist button{display:flex;justify-content:space-between;gap:8px;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;text-align:left}
+.picklist small{color:var(--muted)}
+.newbox{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:14px;padding:10px}
+.link{font-size:13px;word-break:break-all;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:10px}
+
+.center{max-width:420px;margin:0 auto;padding:40px 20px;text-align:center}
+.center h1{font-family:var(--display);font-size:22px;margin:16px 0 8px}
+.center h1 span{color:var(--red)}
+.center p{color:var(--muted)}
+.logo{width:56px;height:56px;border-radius:14px;background:var(--blue);display:grid;place-items:center;margin:0 auto}
+.spin{width:30px;height:30px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--blue);animation:sp 1s linear infinite;margin:60px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--ink);color:var(--card);padding:9px 12px 9px 14px;border-radius:12px;font-weight:600;font-size:14px;z-index:20;display:flex;gap:10px;align-items:center;max-width:92%}
+.toast.err{background:var(--red);color:#fff}
+.toast button{border:0;background:rgba(255,255,255,.2);color:inherit;border-radius:8px;padding:4px 10px;font-weight:700}
+.card-list{padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+@media (prefers-reduced-motion:no-preference){ .sheet{animation:up .2s ease-out} @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}} }
+</style>
+</head>
+<body>
+<div id="app"><div class="spin" role="status" aria-label="Loading"></div></div>
+<div id="layer"></div>
+<script>
+"use strict";
+const API = "https://evqwpzdjvbsjiqegcqwe.supabase.co/functions/v1/nasiya-bot/api";
+const BOT = "nasiyadaftar1_bot";
+const tg = window.Telegram && window.Telegram.WebApp;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fm = n => Math.round(Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+const COLORS = ["#2B4C9B", "#9B2B6F", "#1F8A5B", "#B36B00", "#5B4BA8", "#0E7C86", "#A8433B"];
+const initials = n => String(n).trim().split(/\s+/).map(w => w[0] || "").join("").slice(0, 2).toUpperCase();
+const colorOf = id => COLORS[[...String(id)].reduce((a, ch) => a + ch.charCodeAt(0), 0) % COLORS.length];
+function fmtPhone(p) { if (!p) return ""; const m = p.match(/^\+998(\d{2})(\d{3})(\d{2})(\d{2})$/); return m ? `+998 ${m[1]} ${m[2]} ${m[3]} ${m[4]}` : p; }
+function normPhone(raw) { const plus = raw.trim().startsWith("+"); let d = raw.replace(/\D/g, ""); if (!plus && d.length === 9) d = "998" + d; if (d.startsWith("998") && d.length === 12) return "+" + d; if (plus && d.length >= 10 && d.length <= 15) return "+" + d; return null; }
+function when(iso) { const d = new Date(iso); return String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0") + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+
+const T = {
+  uz: {
+    total: "Jami nasiya", sum: "so'm", debtors: "qarzdor", today: "bugun yozildi", paid: "bugun to'landi",
+    tCust: "Mijozlar", tRep: "Hisobot", search: "Ism yoki telefon", fAll: "Hammasi", fDebt: "Qarzdorlar", fLate: "14+ kun", fOff: "Botga ulanmagan",
+    days: d => `${d} kun`, noPay: "to'lovsiz", last: "oxirgi", offline: "botda yo'q", none: "Hech kim topilmadi", noClients: "Hali mijoz yo'q. Pastdagi tugma bilan birinchi qarzni yozing.",
+    fab: "+ Qarz yozish", aDebt: "Qarz", aPay: "To'lov", aRem: "Eslatma", aInv: "Havola", aPhone: "Telefon", aDel: "O'chirish",
+    hist: "Tarix", undo: "bekor qilish", pay: "to'lov", noNote: "izohsiz", linked: "Telegram ulangan ✓", notLinked: "Telegram ulanmagan", zero: "Qarzi yo'q",
+    shDebt: "Qarz yozish", shPay: "To'lov qabul qilish", shPick: "Kimga yozamiz?", newTitle: "Yangi mijoz", newPh: "Ismi", phonePh: "Telefon: 90 123 45 67", add: "Qo'shish",
+    notePh: "Nima olindi? (non, yog'…)", saveD: a => `Yozish · ${fm(a)} so'm`, saveP: a => `Qabul qilish · ${fm(a)} so'm`, enter: "Summani kiriting", all: "Hammasi",
+    tooMuch: b => `Ko'pi bilan ${fm(b)} so'm`, badName: "Ismni yozing", badPhone: "Raqam noto'g'ri. Masalan: 90 123 45 67", phoneTaken: n => `Bu raqam allaqachon ${n} nomida`,
+    tSaved: "Yozildi · mijozga xabar ketdi", tSavedOff: "Yozildi · mijoz botga ulanmagan", tPaid: "To'lov yozildi", tRem: "Eslatma yuborildi", tRemSoon: h => `Eslatma yaqinda yuborilgan. ${h} soatdan keyin`, tNotLinked: "Mijoz botga ulanmagan. Havolani yuboring.",
+    tUndo: "Yozuv bekor qilindi", tPhone: "Telefon saqlandi", tDeleted: "Mijoz o'chirildi", restore: "Qaytarish", tRestored: "Mijoz qaytarildi", tCopied: "Havola nusxalandi",
+    phoneTitle: "Telefon raqami", save: "Saqlash", delTitle: "Mijozni o'chirish", delAsk: n => `${n} o'chirilsinmi? U ro'yxat va hisobotdan yo'qoladi.`, delDebt: (n, b) => `${n}ning ${fm(b)} so'm qarzi bor. Baribir o'chirilsinmi?`, yesDel: "Ha, o'chirish", cancel: "Bekor qilish",
+    invTitle: "Taklif havolasi", invText: "Mijoz havolani ochib «Start»ni bossa, har bir yozuv haqida Telegram'da xabar oladi.", share: "Telegram'da yuborish", copy: "Nusxalash", shareText: s => `${s}: qarzingizni shu bot orqali kuzatib boring`,
+    rTot: "Jami nasiya", rDebtors: "Qarzdorlar", rClients: "Mijozlar", rLinked: "Botga ulangan", rWeek: "7 kun: yozildi va to'landi", lD: "Nasiya", lP: "To'lov", rLate: "14 kundan beri to'lamaganlar", rNoLate: "Yo'q — hammasi vaqtida",
+    wd: ["Ya", "Du", "Se", "Ch", "Pa", "Ju", "Sh"],
+    err: "Xatolik yuz berdi. Qayta urinib ko'ring.", retry: "Qayta urinish", loadErr: "Ma'lumotlarni yuklab bo'lmadi",
+    noTg: "Bu ilova Telegram ichida ochiladi", noTgSub: "Botni oching va pastdagi «Ilova» tugmasini bosing.", openBot: "Botni ochish",
+    newShop: "Do'koningizni oching", newShopSub: "Nasiyani shu yerga yozasiz, xaridorga Telegram orqali xabar boradi.", shopPh: "Do'kon nomi", create: "Do'kon ochish",
+    myTitle: "Qarzlaringiz", myHist: "Tarix", nothing: "Hali yozuv yo'q",
+  },
+  ru: {
+    total: "Всего в долг", sum: "сум", debtors: "должников", today: "записано сегодня", paid: "оплачено сегодня",
+    tCust: "Покупатели", tRep: "Отчёт", search: "Имя или телефон", fAll: "Все", fDebt: "Должники", fLate: "14+ дней", fOff: "Не в боте",
+    days: d => `${d} дн.`, noPay: "без оплаты", last: "последняя", offline: "не в боте", none: "Никого не нашлось", noClients: "Покупателей пока нет. Запишите первый долг кнопкой внизу.",
+    fab: "+ Записать долг", aDebt: "Долг", aPay: "Оплата", aRem: "Напомнить", aInv: "Ссылка", aPhone: "Телефон", aDel: "Удалить",
+    hist: "История", undo: "отменить", pay: "оплата", noNote: "без комментария", linked: "Telegram подключён ✓", notLinked: "Telegram не подключён", zero: "Долга нет",
+    shDebt: "Записать долг", shPay: "Принять оплату", shPick: "Кому записываем?", newTitle: "Новый покупатель", newPh: "Имя", phonePh: "Телефон: 90 123 45 67", add: "Добавить",
+    notePh: "Что взяли? (хлеб, масло…)", saveD: a => `Записать · ${fm(a)} сум`, saveP: a => `Принять · ${fm(a)} сум`, enter: "Введите сумму", all: "Всё",
+    tooMuch: b => `Максимум ${fm(b)} сум`, badName: "Напишите имя", badPhone: "Номер неверный. Например: 90 123 45 67", phoneTaken: n => `Этот номер уже записан на ${n}`,
+    tSaved: "Записано · покупатель получил сообщение", tSavedOff: "Записано · покупатель не подключён к боту", tPaid: "Оплата записана", tRem: "Напоминание отправлено", tRemSoon: h => `Недавно уже напоминали. Через ${h} ч.`, tNotLinked: "Покупатель не подключён к боту. Отправьте ему ссылку.",
+    tUndo: "Запись отменена", tPhone: "Телефон сохранён", tDeleted: "Покупатель удалён", restore: "Вернуть", tRestored: "Покупатель возвращён", tCopied: "Ссылка скопирована",
+    phoneTitle: "Номер телефона", save: "Сохранить", delTitle: "Удалить покупателя", delAsk: n => `Удалить ${n}? Он пропадёт из списка и отчётов.`, delDebt: (n, b) => `У ${n} долг ${fm(b)} сум. Всё равно удалить?`, yesDel: "Да, удалить", cancel: "Отмена",
+    invTitle: "Ссылка-приглашение", invText: "Когда покупатель откроет ссылку и нажмёт «Start», он будет получать сообщения о каждой записи.", share: "Отправить в Telegram", copy: "Копировать", shareText: s => `${s}: следите за своим долгом через этого бота`,
+    rTot: "Всего в долг", rDebtors: "Должников", rClients: "Покупателей", rLinked: "Подключены к боту", rWeek: "7 дней: записано и оплачено", lD: "Долг", lP: "Оплата", rLate: "Не платят больше 14 дней", rNoLate: "Нет — все платят вовремя",
+    wd: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+    err: "Что-то пошло не так. Попробуйте ещё раз.", retry: "Повторить", loadErr: "Не удалось загрузить данные",
+    noTg: "Это приложение открывается внутри Telegram", noTgSub: "Откройте бота и нажмите кнопку «Ilova» внизу.", openBot: "Открыть бота",
+    newShop: "Откройте свой магазин", newShopSub: "Записывайте долги здесь, покупатель получит сообщение в Telegram.", shopPh: "Название магазина", create: "Открыть магазин",
+    myTitle: "Ваши долги", myHist: "История", nothing: "Записей пока нет",
+  },
+};
+
+const S = { data: null, lang: "uz", tab: "cust", filter: "all", q: "", view: null, hist: null, sheet: null, busy: false, toast: null };
+const L = () => T[S.lang];
+
+/* ---------- api ---------- */
+async function api(action, payload = {}) {
+  try {
+    const r = await fetch(API, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-init-data": tg ? tg.initData : "" },
+      body: JSON.stringify({ action, ...payload }),
+    });
+    let j = {};
+    try { j = await r.json(); } catch (_) {}
+    if (!r.ok && !j.error) j.error = "server";
+    return j;
+  } catch (_) {
+    return { error: "network" };
+  }
+}
+async function load() {
+  const d = await api("init");
+  if (d.error) { S.data = { role: "error" }; render(); return; }
+  S.data = d;
+  S.lang = d.lang === "ru" ? "ru" : "uz";
+  if (S.view) await loadHist();
+  render();
+}
+async function loadHist() {
+  const h = await api("history", { cid: S.view });
+  if (h.error) { S.view = null; S.hist = null; return; }
+  S.hist = h;
+}
+
+/* ---------- feedback ---------- */
+let toastT;
+function toast(msg, opts = {}) {
+  S.toast = { msg, ...opts };
+  renderLayer();
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { S.toast = null; renderLayer(); }, opts.action ? 6000 : 2600);
+  try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(opts.err ? "error" : "success"); } catch (_) {}
+}
+function errMsg(r) {
+  const l = L();
+  if (r.error === "badPhone") return l.badPhone;
+  if (r.error === "phoneTaken") return l.phoneTaken(r.name || "");
+  if (r.error === "tooMuch") return l.tooMuch(r.max || 0);
+  if (r.error === "badName") return l.badName;
+  if (r.error === "remSoon") return l.tRemSoon(r.hours || 1);
+  if (r.error === "notLinked") return l.tNotLinked;
+  return l.err;
+}
+
+/* ---------- views ---------- */
+function page() {
+  const d = S.data, l = L();
+  if (!tg || !tg.initData) return `<div class="center"><div class="logo">${logoSvg()}</div><h1>Nasiya<span>Daftar</span></h1><p>${l.noTg}</p><p>${l.noTgSub}</p><p><a class="main" style="display:inline-block;width:auto;padding:12px 20px;text-decoration:none" href="https://t.me/${BOT}">${l.openBot}</a></p></div>`;
+  if (!d) return `<div class="spin" role="status"></div>`;
+  if (d.role === "error") return `<div class="center"><h1 style="font-size:18px">${l.loadErr}</h1><p>${l.err}</p><button class="main" data-a="reload" style="width:auto;padding:12px 20px">${l.retry}</button></div>`;
+  if (d.role === "new") return `<div class="center"><div class="logo">${logoSvg()}</div><h1>Nasiya<span>Daftar</span></h1><h2 style="font-size:18px;margin:14px 0 4px">${l.newShop}</h2><p>${l.newShopSub}</p>
+    <div style="display:flex;flex-direction:column;gap:8px;text-align:left"><input class="inp" id="shopname" placeholder="${l.shopPh}" maxlength="80" autocomplete="off"><div class="err" id="shoperr"></div><button class="main" data-a="createShop">${l.create}</button></div></div>`;
+  if (d.role === "customer") return customerPage();
+  if (S.view && S.hist) return custView();
+  return home();
+}
+function logoSvg() { return `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18" stroke="#F3A39C"/><path d="M12 8h4M12 12h4M12 16h3"/></svg>`; }
+function langSw() { return `<div class="lang" role="group" aria-label="Til / Язык"><button data-a="lang" data-v="uz" aria-pressed="${S.lang === "uz"}">UZ</button><button data-a="lang" data-v="ru" aria-pressed="${S.lang === "ru"}">RU</button></div>`; }
+
+function home() {
+  const d = S.data, l = L(), cs = d.customers;
+  const tot = cs.reduce((s, c) => s + Math.max(0, c.balance), 0);
+  const today = d.week[d.week.length - 1] || { debt: 0, pay: 0 };
+  const head = `<div class="hero"><div class="top"><span class="shop">${esc(d.shop.name)}</span>${langSw()}</div>
+    <div class="big num">${fm(tot)} <span>${l.sum}</span></div>
+    <div class="stats"><div class="stat"><b class="num">${cs.filter(c => c.balance > 0).length}</b><span>${l.debtors}</span></div><div class="stat"><b class="num">+${fm(today.debt)}</b><span>${l.today}</span></div><div class="stat"><b class="num">−${fm(today.pay)}</b><span>${l.paid}</span></div></div></div>
+    <div class="tabs" role="tablist"><button role="tab" data-a="tab" data-v="cust" aria-selected="${S.tab === "cust"}">${l.tCust}</button><button role="tab" data-a="tab" data-v="rep" aria-selected="${S.tab === "rep"}">${l.tRep}</button></div>`;
+  if (S.tab === "rep") return head + report();
+  const q = S.q.trim().toLowerCase(), qd = q.replace(/\D/g, "");
+  let list = cs.filter(c => !q || c.name.toLowerCase().includes(q) || (qd.length >= 3 && (c.phone || "").includes(qd)));
+  if (S.filter === "debt") list = list.filter(c => c.balance > 0);
+  if (S.filter === "late") list = list.filter(c => c.days >= 14);
+  if (S.filter === "off") list = list.filter(c => !c.linked);
+  list.sort((a, b) => b.balance - a.balance || String(b.last).localeCompare(String(a.last)));
+  const f = [["all", l.fAll], ["debt", l.fDebt], ["late", l.fLate], ["off", l.fOff]];
+  const body = !cs.length ? `<div class="empty">${l.noClients}</div>` : list.length ? list.map(c => `<button class="row" data-a="open" data-v="${c.id}">
+      <span class="ava" style="background:${colorOf(c.id)}">${esc(initials(c.name))}</span>
+      <span class="t"><b>${esc(c.name)}</b><small>${c.balance > 0 && c.days ? `${l.days(c.days)} ${l.noPay}` : `${l.last}: ${when(c.last).slice(0, 5)}`}${c.days >= 14 ? `<span class="badge">${l.days(c.days)}</span>` : ""}${c.linked ? "" : ` · ${l.offline}`}</small></span>
+      <span class="amt num ${c.balance > 0 ? "d" : "z"}">${fm(Math.max(0, c.balance))}</span></button>`).join("") : `<div class="empty">${l.none}</div>`;
+  return head + `<label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" placeholder="${l.search}" value="${esc(S.q)}" aria-label="${l.search}" autocomplete="off"></label>
+    <div class="chips">${f.map(([k, t]) => `<button data-a="filter" data-v="${k}" aria-pressed="${S.filter === k}">${t}</button>`).join("")}</div>
+    <div class="list">${body}</div>
+    <button class="fab" data-a="sheet" data-v="debt">${l.fab}</button>`;
+}
+function report() {
+  const d = S.data, l = L(), cs = d.customers;
+  const tot = cs.reduce((s, c) => s + Math.max(0, c.balance), 0);
+  const max = Math.max(1, ...d.week.map(w => Math.max(w.debt, w.pay)));
+  const late = cs.filter(c => c.days >= 14).sort((a, b) => b.days - a.days);
+  return `<div class="rep">
+    <div class="box"><div class="kv"><span>${l.rTot}</span><b class="num">${fm(tot)} ${l.sum}</b></div><div class="kv"><span>${l.rDebtors}</span><b class="num">${cs.filter(c => c.balance > 0).length}</b></div><div class="kv"><span>${l.rClients}</span><b class="num">${cs.length}</b></div><div class="kv"><span>${l.rLinked}</span><b class="num">${cs.filter(c => c.linked).length}</b></div></div>
+    <div class="box"><h3>${l.rWeek}</h3><div class="bars">${d.week.map(w => `<div class="bar" title="+${fm(w.debt)} / −${fm(w.pay)}"><div class="pair"><i class="d" style="height:${w.debt / max * 100}%"></i><i class="p" style="height:${w.pay / max * 100}%"></i></div><small>${l.wd[new Date(w.day + "T12:00:00").getDay()]}</small></div>`).join("")}</div>
+      <div class="legend"><span><i style="background:var(--red)"></i>${l.lD}</span><span><i style="background:var(--green)"></i>${l.lP}</span></div></div>
+    <div class="box"><h3>${l.rLate}</h3>${late.length ? late.map(c => `<div class="kv"><span>${esc(c.name)} · ${l.days(c.days)}</span><b class="num" style="color:var(--red)">${fm(c.balance)}</b></div>`).join("") : `<span style="color:var(--muted)">${l.rNoLate}</span>`}</div>
+  </div>`;
+}
+function custView() {
+  const l = L(), c = S.hist.customer, b = c.balance;
+  return `<div class="cust-head"><div class="ava" style="background:${colorOf(c.id)}">${esc(initials(c.name))}</div><h2>${esc(c.name)}</h2>${c.phone ? `<div class="ph num">${fmtPhone(c.phone)}</div>` : ""}
+    <div class="bal num ${b > 0 ? "d" : "z"}">${b > 0 ? fm(b) + " " + l.sum : l.zero}</div><small>${c.linked ? l.linked : l.notLinked}${b > 0 && c.days ? ` · ${l.days(c.days)} ${l.noPay}` : ""}</small></div>
+   <div class="acts">
+    <button class="a-debt" data-a="sheet" data-v="debt" data-c="${c.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>${l.aDebt}</button>
+    <button class="a-pay" data-a="sheet" data-v="pay" data-c="${c.id}" ${b > 0 ? "" : "disabled"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>${l.aPay}</button>
+    <button class="a-rem" data-a="remind" ${b > 0 && c.linked ? "" : "disabled"}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>${l.aRem}</button>
+    <button class="a-inv" data-a="invite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>${l.aInv}</button>
+   </div>
+   <div class="acts2"><button data-a="phone">${l.aPhone}</button><button class="del" data-a="askdel">${l.aDel}</button></div>
+   <div class="sec">${l.hist}</div>
+   <div class="hist">${S.hist.entries.length ? S.hist.entries.map(o => `<div class="h ${o.deleted ? "off" : ""}"><div class="t"><b>${o.kind === "debt" ? esc(o.note || l.noNote) : l.pay}</b><small class="num">${when(o.at)}</small></div>
+     <span class="v num ${o.kind === "debt" ? "d" : "p"}">${o.kind === "debt" ? "+" : "−"}${fm(o.amount)}</span>${o.deleted ? "<span></span>" : `<button data-a="undo" data-v="${o.id}">${l.undo}</button>`}</div>`).join("") : `<div class="empty">${l.nothing}</div>`}</div>`;
+}
+function customerPage() {
+  const d = S.data, l = L();
+  return `<div class="hero"><div class="top"><span class="shop">Nasiya Daftar</span>${langSw()}</div><div class="big" style="font-size:22px">${l.myTitle}</div></div>
+   <div class="card-list">${d.mine.map(m => `<div class="box"><div class="kv"><span>${esc(m.shop)}</span><b class="num" style="color:${m.balance > 0 ? "var(--red)" : "var(--green)"}">${fm(m.balance)} ${l.sum}</b></div></div>`).join("")}</div>
+   <div class="sec">${l.myHist}</div>
+   <div class="hist">${d.history.length ? d.history.map(o => `<div class="h"><div class="t"><b>${o.kind === "debt" ? esc(o.note || l.noNote) : l.pay}</b><small class="num">${when(o.at)}${d.mine.length > 1 ? " · " + esc(o.shop) : ""}</small></div><span class="v num ${o.kind === "debt" ? "d" : "p"}">${o.kind === "debt" ? "+" : "−"}${fm(o.amount)}</span><span></span></div>`).join("") : `<div class="empty">${l.nothing}</div>`}</div>`;
+}
+
+function sheetView() {
+  const l = L(), sh = S.sheet;
+  if (sh.kind === "phone") {
+    const c = S.hist.customer;
+    return `<div class="sheet" role="dialog" aria-label="${l.phoneTitle}"><div class="grab"></div><h3>${l.phoneTitle}</h3><div class="who">${esc(c.name)}</div>
+      <input class="inp num" id="phoneinp" inputmode="tel" placeholder="${l.phonePh}" value="${esc(sh.val ?? fmtPhone(c.phone))}" maxlength="20" autocomplete="off"><div class="err">${esc(sh.err || "")}</div>
+      <button class="main" data-a="savephone" ${S.busy ? "disabled" : ""}>${l.save}</button></div>`;
+  }
+  if (sh.kind === "del") {
+    const c = S.hist.customer;
+    return `<div class="sheet" role="dialog" aria-label="${l.delTitle}"><div class="grab"></div><h3>${l.delTitle}</h3><p style="margin:0">${esc(c.balance > 0 ? l.delDebt(c.name, c.balance) : l.delAsk(c.name))}</p>
+      <button class="main d" data-a="dodel" ${S.busy ? "disabled" : ""}>${l.yesDel}</button><button class="ghost" data-a="close">${l.cancel}</button></div>`;
+  }
+  if (sh.kind === "invite") {
+    return `<div class="sheet" role="dialog" aria-label="${l.invTitle}"><div class="grab"></div><h3>${l.invTitle}</h3><div class="who">${esc(S.hist.customer.name)}</div>
+      <div class="link" id="invlink">${esc(S.hist.link)}</div><p style="margin:0;color:var(--muted);font-size:13px">${l.invText}</p>
+      <button class="main" data-a="share">${l.share}</button><button class="ghost" data-a="copy">${l.copy}</button></div>`;
+  }
+  const cs = S.data.customers;
+  const c = sh.cid ? (cs.find(x => x.id === sh.cid) || (S.hist && S.hist.customer.id === sh.cid ? S.hist.customer : null)) : null;
+  if (!c) {
+    const list = [...cs].sort((a, b) => String(b.last).localeCompare(String(a.last)));
+    return `<div class="sheet" role="dialog" aria-label="${l.shPick}"><div class="grab"></div><h3>${l.shPick}</h3>
+      <div class="newbox"><b>${l.newTitle}</b><input class="inp" id="newname" placeholder="${l.newPh}" maxlength="60" value="${esc(sh.nn || "")}" autocomplete="off"><input class="inp num" id="newphone" placeholder="${l.phonePh}" inputmode="tel" maxlength="20" value="${esc(sh.np || "")}" autocomplete="off"><div class="err">${esc(sh.err || "")}</div><button class="main" data-a="newc" ${S.busy ? "disabled" : ""}>${l.add}</button></div>
+      <div class="picklist">${list.map(x => `<button data-a="pick" data-v="${x.id}"><span>${esc(x.name)}${x.phone ? `<br><small class="num">${fmtPhone(x.phone)}</small>` : ""}</span><span class="num" style="color:${x.balance > 0 ? "var(--red)" : "var(--green)"}">${fm(Math.max(0, x.balance))}</span></button>`).join("")}</div></div>`;
+  }
+  const b = c.balance, isPay = sh.kind === "pay", a = Number(sh.amt || 0);
+  const half = Math.round(b / 2 / 1000) * 1000;
+  const quick = isPay ? [[l.all, b], [fm(half), half]].filter(q => q[1] > 0 && (q[0] === l.all || q[1] < b)) : [["5 000", 5000], ["10 000", 10000], ["20 000", 20000], ["50 000", 50000], ["100 000", 100000]];
+  const err = sh.err || (isPay && a > b ? l.tooMuch(b) : "");
+  return `<div class="sheet" role="dialog" aria-label="${isPay ? l.shPay : l.shDebt}"><div class="grab"></div>
+    <h3>${isPay ? l.shPay : l.shDebt}</h3><div class="who">${esc(c.name)} · ${fm(Math.max(0, b))} ${l.sum}</div>
+    <div class="amount num ${isPay ? "p" : "d"}">${a ? fm(a) : "0"} <span>${l.sum}</span></div>
+    <div class="quick">${quick.map(q => `<button data-a="quick" data-v="${q[1]}">${q[0]}</button>`).join("")}</div>
+    <div class="pad">${["1", "2", "3", "4", "5", "6", "7", "8", "9", "000", "0", "⌫"].map(k => `<button data-a="key" data-v="${k}" aria-label="${k === "⌫" ? "Delete" : k}">${k}</button>`).join("")}</div>
+    ${isPay ? "" : `<input class="inp" id="note" placeholder="${l.notePh}" maxlength="120" value="${esc(sh.note || "")}" autocomplete="off">`}
+    <div class="err">${esc(err)}</div>
+    <button class="main ${isPay ? "p" : "d"}" data-a="save" ${a > 0 && !(isPay && a > b) && !S.busy ? "" : "disabled"}>${a > 0 ? (isPay ? l.saveP(a) : l.saveD(a)) : l.enter}</button></div>`;
+}
+
+function render() {
+  document.documentElement.lang = S.lang;
+  const focusId = document.activeElement && document.activeElement.id;
+  const caret = focusId && document.activeElement.selectionStart;
+  $("#app").innerHTML = page();
+  if (focusId === "q" && $("#q")) { $("#q").focus(); try { $("#q").setSelectionRange(caret, caret); } catch (_) {} }
+  renderLayer();
+  syncBack();
+}
+function renderLayer() {
+  const keep = {};
+  ["note", "newname", "newphone", "phoneinp"].forEach(id => { const el = $("#" + id); if (el) keep[id] = el.value; });
+  let html = "";
+  if (S.sheet && S.data && S.data.role === "owner") html += `<div class="scrim" data-a="close"></div>` + sheetView();
+  if (S.toast) html += `<div class="toast ${S.toast.err ? "err" : ""}" role="status"><span>${esc(S.toast.msg)}</span>${S.toast.action ? `<button data-a="${S.toast.action}" data-v="${esc(S.toast.v || "")}">${esc(S.toast.label)}</button>` : ""}</div>`;
+  $("#layer").innerHTML = html;
+  Object.entries(keep).forEach(([id, v]) => { const el = $("#" + id); if (el && !el.value) el.value = v; });
+}
+function syncBack() {
+  if (!tg || !tg.BackButton) return;
+  if (S.sheet || S.view) tg.BackButton.show(); else tg.BackButton.hide();
+}
+function goBack() {
+  if (S.sheet) { S.sheet = null; renderLayer(); syncBack(); return; }
+  if (S.view) { S.view = null; S.hist = null; render(); window.scrollTo(0, 0); }
+}
+
+/* ---------- actions ---------- */
+function readSheetInputs() {
+  const sh = S.sheet; if (!sh) return;
+  if ($("#note")) sh.note = $("#note").value;
+  if ($("#newname")) sh.nn = $("#newname").value;
+  if ($("#newphone")) sh.np = $("#newphone").value;
+  if ($("#phoneinp")) sh.val = $("#phoneinp").value;
+}
+async function run(fn) { if (S.busy) return; S.busy = true; renderLayer(); try { await fn(); } finally { S.busy = false; renderLayer(); } }
+
+document.addEventListener("click", async e => {
+  const t = e.target.closest("[data-a]"); if (!t || t.disabled) return;
+  const a = t.dataset.a, v = t.dataset.v, l = L();
+  readSheetInputs();
+  switch (a) {
+    case "reload": S.data = null; render(); load(); break;
+    case "lang": S.lang = v; render(); api("setLang", { lang: v }); break;
+    case "tab": S.tab = v; render(); break;
+    case "filter": S.filter = v; render(); break;
+    case "open": S.view = v; S.hist = null; $("#app").innerHTML = `<div class="spin"></div>`; await loadHist(); render(); window.scrollTo(0, 0); break;
+    case "sheet": S.sheet = { kind: v, cid: t.dataset.c || null, amt: "", note: "" }; renderLayer(); syncBack(); break;
+    case "close": S.sheet = null; renderLayer(); syncBack(); break;
+    case "pick": S.sheet.cid = v; S.sheet.err = ""; renderLayer(); break;
+    case "key": { let s = String(S.sheet.amt || ""); s = v === "⌫" ? s.slice(0, -1) : (s + v).replace(/^0+/, ""); if (s.length > 10) return; S.sheet.amt = s; S.sheet.err = ""; renderLayer(); break; }
+    case "quick": S.sheet.amt = String(v); S.sheet.err = ""; renderLayer(); break;
+    case "newc": await run(async () => {
+      const sh = S.sheet, name = (sh.nn || "").trim().replace(/\s+/g, " ");
+      if (!name) { sh.err = l.badName; return; }
+      if (!normPhone(sh.np || "")) { sh.err = l.badPhone; return; }
+      const r = await api("addCustomer", { name, phone: sh.np });
+      if (r.error) { sh.err = errMsg(r); return; }
+      S.data.customers.push(r.customer); sh.cid = r.customer.id; sh.err = "";
+    }); break;
+    case "save": await run(async () => {
+      const sh = S.sheet, n = Number(sh.amt);
+      const r = await api("addEntry", { cid: sh.cid, kind: sh.kind, amount: n, note: sh.kind === "debt" ? (sh.note || "") : "" });
+      if (r.error) { sh.err = errMsg(r); return; }
+      S.sheet = null;
+      toast(sh.kind === "pay" ? l.tPaid : (r.notified ? l.tSaved : l.tSavedOff), { action: "undoLast", v: r.entryId, label: l.undo });
+      await load();
+    }); break;
+    case "undoLast":
+    case "undo": await run(async () => {
+      const r = await api("undo", { eid: v });
+      if (r.error && r.error !== "gone") { toast(errMsg(r), { err: true }); return; }
+      toast(l.tUndo); await load();
+    }); break;
+    case "remind": await run(async () => {
+      const r = await api("remind", { cid: S.view });
+      if (r.error) toast(errMsg(r), { err: true }); else toast(l.tRem);
+    }); break;
+    case "invite": S.sheet = { kind: "invite" }; renderLayer(); syncBack(); break;
+    case "share": {
+      const url = `https://t.me/share/url?url=${encodeURIComponent(S.hist.link)}&text=${encodeURIComponent(l.shareText(S.data.shop.name))}`;
+      if (tg && tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, "_blank");
+      break;
+    }
+    case "copy": try { await navigator.clipboard.writeText(S.hist.link); toast(l.tCopied); } catch (_) { const el = $("#invlink"); if (el) window.getSelection().selectAllChildren(el); } break;
+    case "phone": S.sheet = { kind: "phone" }; renderLayer(); syncBack(); const pi = $("#phoneinp"); if (pi) pi.focus(); break;
+    case "savephone": await run(async () => {
+      const sh = S.sheet;
+      if (!normPhone(sh.val || "")) { sh.err = l.badPhone; return; }
+      const r = await api("setPhone", { cid: S.view, phone: sh.val });
+      if (r.error) { sh.err = errMsg(r); return; }
+      S.sheet = null; toast(l.tPhone); await load();
+    }); break;
+    case "askdel": S.sheet = { kind: "del" }; renderLayer(); syncBack(); break;
+    case "dodel": await run(async () => {
+      const cid = S.view;
+      const r = await api("delete", { cid });
+      if (r.error) { toast(errMsg(r), { err: true }); return; }
+      S.sheet = null; S.view = null; S.hist = null;
+      toast(l.tDeleted, { action: "restore", v: cid, label: l.restore });
+      await load();
+    }); break;
+    case "restore": await run(async () => {
+      const r = await api("restore", { cid: v });
+      if (r.error) { toast(errMsg(r), { err: true }); return; }
+      toast(l.tRestored); await load();
+    }); break;
+    case "createShop": {
+      const name = ($("#shopname").value || "").trim();
+      if (!name) { $("#shoperr").textContent = l.badName; return; }
+      t.disabled = true;
+      const r = await api("createShop", { name });
+      if (r.error && r.error !== "exists") { $("#shoperr").textContent = l.err; t.disabled = false; return; }
+      S.data = null; render(); await load(); break;
+    }
+  }
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "q") { S.q = e.target.value; render(); }
+});
+
+/* ---------- boot ---------- */
+(function boot() {
+  if (tg) {
+    try {
+      tg.ready(); tg.expand();
+      document.documentElement.dataset.theme = tg.colorScheme === "dark" ? "dark" : "light";
+      tg.onEvent("themeChanged", () => { document.documentElement.dataset.theme = tg.colorScheme === "dark" ? "dark" : "light"; });
+      tg.BackButton.onClick(goBack);
+      if (tg.setHeaderColor) tg.setHeaderColor(tg.colorScheme === "dark" ? "#22356B" : "#2B4C9B");
+    } catch (_) {}
+  }
+  const lc = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.language_code) || navigator.language || "";
+  S.lang = String(lc).startsWith("ru") ? "ru" : "uz";
+  if (!tg || !tg.initData) { render(); return; }
+  load();
+})();
+</script>
+</body>
+</html>
